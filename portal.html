@@ -31,11 +31,11 @@ html,body{height:100%;margin:0;padding:0}body{background:#1c1917;font-family:-ap
 .sb-footer{padding:8px 10px;border-top:1px solid #1f2937;font-size:9px;color:#374151}
 .arch-toggle{width:100%;font-size:10px;padding:5px 10px;background:transparent;border:none;border-top:1px solid #1f2937;color:#6b7280;cursor:pointer;text-align:left}
 .arch-toggle:hover{color:#a78bfa}
-.vt{padding:9px 10px;border-top:1px solid #1f2937}
-.vl{font-size:10px;color:#4b5563;margin-bottom:4px}
-.vbs{display:flex;gap:4px}
-.vb{flex:1;font-size:11px;padding:4px 0;cursor:pointer;border-radius:6px;background:transparent;color:#6b7280;border:1px solid #374151}
-.vb.va{background:#4f46e5;color:#fff;border-color:#4f46e5;font-weight:600}
+
+
+
+
+
 .main{flex:1;display:flex;flex-direction:column;overflow:hidden}
 .topbar{padding:9px 14px 0;border-bottom:1px solid #1f2937;background:#0d1117}
 .tr{display:flex;align-items:center;justify-content:space-between;margin-bottom:7px}
@@ -141,13 +141,7 @@ textarea{width:100%;font-size:11px;padding:5px 8px;background:#111827;border:1px
   </div>
   <div class="clist" id="clist"></div>
   <button class="arch-toggle" onclick="toggleArch()" id="archBtn">📁 Show Archived (0)</button>
-  <div class="vt">
-    <div class="vl">View mode</div>
-    <div class="vbs">
-      <button class="vb va" id="bInt" onclick="sv('internal')">Internal</button>
-      <button class="vb" id="bCli" onclick="sv('client')">Client</button>
-    </div>
-  </div>
+
   <div class="sb-footer" id="synctime">Last synced: 3:13 PM ET · Mar 13, 2026</div>
 </div>
 <div class="main">
@@ -193,6 +187,7 @@ const SM={
 };
 const ACTIVE_STAGES=new Set(["paid","waiting_on_materials","build_in_progress","build_completed","training_scheduled","driving_utilization"]);
 const OM={46491757:"Paul Gervasi",81817361:"Nico Valenzuela",173758648:"Philip Jacobs",173757457:"Taylor Mastin",495868686:"Chance Ray",644465735:"Alan May",116399656:"Chad Hunt",1592156152:"Josh Tazzetta",63601710:"Jesse Mayek",51013924:"Levi Bond",83451467:"Cara Landolt"};
+const EXTRAS={"Lunar Audio Video LLC":{"id":"4501","hsId":"50813295245","dropbox":"","contacts":[{"n":"Chris Young","t":"Managing Director","e":"cyoung@lunarav.com","p":""}],"buildStart":"2026-03-06"},"Top Tier":{"id":"4489","hsId":"49070841256","dropbox":"","contacts":[{"n":"Jordon Winters","t":"","e":"jordon@toptierhbs.net","p":"8134532747"},{"n":"Shermal Thomas","t":"Office Assistant","e":"shermal@toptierhbs.net","p":"8138023378"}]},"Re-Bath of Augusta":{"id":"","hsId":"","dropbox":"","contacts":[]},"Alta Windows & Door":{"id":"4473","hsId":"48192452487","dropbox":"","contacts":[{"n":"Steven Juker","t":"Director of Operations","e":"sjuker@altawindowdoor.com","p":"2083512219"},{"n":"msessa","t":"","e":"msessa@altawindowdoor.com","p":""}]},"Affordable Windows and Roofing":{"id":"","hsId":"","dropbox":"","contacts":[]},"SuperFast Kitchen and Bath":{"id":"","hsId":"","dropbox":"","contacts":[]},"Elia Bathroom Designs":{"id":"","hsId":"","dropbox":"","contacts":[]},"Cypress Bath":{"id":"","hsId":"","dropbox":"","contacts":[]},"Jay Bee Contracting":{"id":"4399","hsId":"52910956374","dropbox":"","contacts":[{"n":"Justin Britton","t":"President","e":"jbritton@jaybeecontracting.com","p":"585-880-3457"}],"buildStart":"2025-09-09"},"Quick Bath Solutions":{"id":"","hsId":"","dropbox":"","contacts":[]},"XPRT Outdoor":{"id":"","hsId":"","dropbox":"","contacts":[]},"Custom Services Co LLC":{"id":"4262","hsId":"30228214800","dropbox":"","contacts":[{"n":"Rick Eavenson","t":"Certified Aging-in-Place Specialist","e":"rick@customservicescollc.com","p":"9012033241"}]},"Lux Design Builds":{"id":"3871","hsId":"31640417068","dropbox":"","contacts":[{"n":"Marcin Wyszomirski","t":"Interior Designer","e":"marcin@luxdesignbuilds.com","p":"","hsContactId":"150617853474"},{"n":"Sydney Mukwacha","t":"Office Manager","e":"officemgr@luxdesignbuilds.com","p":"4254358936","hsContactId":"32852142618"}],"buildStart":"2024-05-15"},"STL Roof Pros":{"id":"","hsId":"","dropbox":"","contacts":[]},"Virginia Bath Works Inc.":{"id":"","hsId":"","dropbox":"","contacts":[]},"Rebath San Antonio":{"id":"","hsId":"","dropbox":"","contacts":[]},"Dominican Outdoor Solutions":{"id":"","hsId":"","dropbox":"","contacts":[]},"Refined Spaces LLC":{"id":"","hsId":"","dropbox":"","contacts":[]},"MOD Bath USA":{"id":"","hsId":"","dropbox":"","contacts":[]},"Go Roofing":{"id":"","hsId":"","dropbox":"","contacts":[]},"Window Depot USA of Fort Wayne":{"id":"","hsId":"","dropbox":"","contacts":[]},"Bath Planet of Paducah":{"id":"4286","hsId":"31622601557","dropbox":"","contacts":[],"buildStart":"2025-05-30"},"Donaway Bath":{"id":"4263","hsId":"30269165230","dropbox":"","contacts":[{"n":"Galen Gardner","t":"Owner","e":"galen@donaway.com","p":"4437831710","hsContactId":"100917225250"}],"buildStart":"2025-03-12"},"Re-Bath of New England":{"id":"4256","hsId":"29688847148","dropbox":"","contacts":[{"n":"Bill Trombly","t":"Owner","e":"bill.trombly@rebath.com","p":"6032353433","hsContactId":"174117297571"},{"n":"Jordan Trombly","t":"General Manager","e":"jordan.trombly@rebath.com","p":"6036250303","hsContactId":"96918250648"},{"n":"Jeff McCormack","t":"Sales Manager","e":"jeff.mccormack@rebath.com","p":"6036250303","hsContactId":"104030483573"},{"n":"Susan Oliver","t":"VP of Operations","e":"susan.oliver@rebath.com","p":"4322039736"}],"buildStart":"2025-03-12"},"Legacy Design & Remodeling":{"id":"","hsId":"","dropbox":"","contacts":[]},"Stonebridge Kitchen and Bath LLC":{"id":"4490","hsId":"51139252400","dropbox":"","contacts":[{"n":"Gage Smith","t":"Co-Founder","e":"gagesmith@stonebridgekitchenandbath.com","p":"3522742679"}]},"4D Custom Builders":{"id":"","hsId":"","dropbox":"","contacts":[]},"Bathrooms of Charleston":{"id":"","hsId":"","dropbox":"","contacts":[]},"Lotus Kitchen & Bath":{"id":"","hsId":"","dropbox":"","contacts":[]},"Fortress Roofing":{"id":"","hsId":"","dropbox":"","contacts":[]},"Backyard Fun Pools":{"id":"","hsId":"","dropbox":"","contacts":[]},"Paramount Xterior":{"id":"4282","hsId":"30987093852","dropbox":"","contacts":[{"n":"Ian Ally","t":"Owner","e":"ianally@paramountxterior.com","p":"2404058648"},{"n":"Bryan Puglio","t":"","e":"bpuglio@paramountxterior.com","p":""}]},"Well Decor LLC":{"id":"4243","hsId":"29699866979","dropbox":"","contacts":[{"n":"Yuan Zhou","t":"Owner","e":"yuan@well-decor.com","p":"8586036486","hsContactId":"97697525762"}],"buildStart":"2025-02-18"},"Welcome Renovation":{"id":"4237","hsId":"29642322250","dropbox":"","contacts":[{"n":"Greg Takeshita","t":"Founder","e":"greg@welcomerenovation.com","p":"9493389960"},{"n":"Lukus Meulink","t":"Director of Project Management","e":"lukus.meulink@welcomerenovation.com","p":"3108032496"}],"buildStart":"2025-02-17"},"Sunshine Contracting Corporation":{"id":"3815","hsId":"42249021846","dropbox":"","contacts":[{"n":"Ryan Sabo","t":"Owner","e":"rsabo@sunshinecontractingcorp.com","p":"7034892691"},{"n":"Crawford Conniff","t":"Sales Manager","e":"cconniff@sunshinecontractingcorp.com","p":"7034998654"},{"n":"Nate Sullivan","t":"VP of Operations","e":"nsullivan@sunshinecontractingcorp.com","p":"7034998654"}],"buildStart":"2024-04-01"},"Platinum Roofing Construction":{"id":"4273","hsId":"29201891909","dropbox":"","contacts":[{"n":"Jason Bye","t":"","e":"jbye.grs@gmail.com","p":"5079511465","hsContactId":"94790742870"}],"buildStart":"2025-03-17"},"SE Property Group":{"id":"4258","hsId":"30345736117","dropbox":"","contacts":[]},"Quality Sheet Metal Heating & Air Inc.":{"id":"4279","hsId":"31701952826","dropbox":"","contacts":[{"n":"John McNamee","t":"","e":"qualityshtmetal7@gmail.com","p":"9169189920"},{"n":"Tonya McNamee","t":"CFO","e":"tmcnamee@comehometoquality.com","p":"9169189920"}]},"Re-Bath Midland":{"id":"4231","hsId":"36417221527","dropbox":"","contacts":[{"n":"Henry Wall","t":"Owner","e":"henry.wall@rebath.com","p":"8063192213"},{"n":"Susan Oliver","t":"VP of Operations","e":"susan.oliver@rebath.com","p":"4322039736"}],"buildStart":"2025-02-04"},"Pacific Coast Re-Bath":{"id":"4270","hsId":"30589147820","dropbox":"","contacts":[{"n":"susan engbrecht","t":"","e":"mstorms@pcrebath.com","p":"8184896351","hsContactId":"105064119878"}],"buildStart":"2025-03-26"},"Lutton Construction":{"id":"4269","hsId":"30350664301","dropbox":"","contacts":[{"n":"Kyle Lutton","t":"Owner","e":"kyle@luttonco.com","p":"6149802281"},{"n":"Raymond Perez","t":"Production Manager","e":"raymond@luttonco.com","p":"5622212165"}]},"Task Masters Handyman Services Inc":{"id":"4274","hsId":"30426563492","dropbox":"","contacts":[{"n":"Chris Deanovic","t":"COO","e":"chrisd@tmimn.com","p":"6128367808"},{"n":"Calvin Schiltz","t":"","e":"calvins@tmimn.com","p":""}]},"MODE Renovation LLC":{"id":"3983","hsId":"42249819261","dropbox":"","contacts":[{"n":"Ryan Keene","t":"CEO","e":"rkeene@moderenovation.com","p":"7148847498"},{"n":"Linda Miller","t":"Sales Manager","e":"lmiller@moderenovation.com","p":"9257195101"}],"buildStart":"2024-09-03"},"Potomac Custom Remodeling":{"id":"4284","hsId":"31030356805","dropbox":"","contacts":[{"n":"anthony marks","t":"Implementation Director","e":"anthony@potomaccustomremodeling.com","p":"3017606869","hsContactId":"105845219730"},{"n":"Cory Minzyk","t":"VP of Marketing","e":"cory.minzyk@potomaccustomremodeling.com","p":"7034050904","hsContactId":"194982850060"}],"buildStart":"2025-03-26"},"Home Pros Remodeling":{"id":"4247","hsId":"30080307989","dropbox":"","contacts":[{"n":"Dan Reyes","t":"Owner","e":"danr@homepros-usa.com","p":"5056006783","hsContactId":"100132375114"},{"n":"Jason Balthrop","t":"General Manager","e":"jasonb@homepros-usa.com","p":"5053626276","hsContactId":"100149126728"},{"n":"James Culwell","t":"Sales Manager","e":"jculwell@homepros-usa.com","p":"3603938935","hsContactId":"109428761121"}],"buildStart":"2025-03-05"},"Timber Ridge Roofing & Exteriors":{"id":"4278","hsId":"31071289206","dropbox":"","contacts":[{"n":"Kyler McCarty","t":"Owner","e":"kmccarty@timberridgeroof.com","p":"7125718089"}]},"Big Country Exteriors":{"id":"4277","hsId":"29631079787","dropbox":"","contacts":[{"n":"Timothy Dascenzo","t":"Owner","e":"tim@bigcountryexteriors.com","p":"6094915334"}]},"Baths by Bill":{"id":"4256","hsId":"29688847148","dropbox":"","contacts":[],"buildStart":"2025-03-12"},"Legacy Exteriors":{"id":"3965","hsId":"21963237464","dropbox":"","contacts":[{"n":"Jeremy Bibb","t":"Owner","e":"jeremy@legacyexteriorstx.com","p":"5126631864","hsContactId":"40285839188"},{"n":"Stephen Hines","t":"Sales Manager","e":"stephen@legacyexteriorstx.com","p":"5126631864","hsContactId":"40285839190"}],"buildStart":"2024-07-23"},"Design Surfaces":{"id":"4232","hsId":"34585614357","dropbox":"","contacts":[{"n":"Nick Benvenuto","t":"Owner / Lead Designer","e":"nick@designsurfacesmi.com","p":"6164058011"},{"n":"Kurt Schlosser","t":"Showroom Manager","e":"kurt@designsurfacesmi.com","p":"7346360750"}],"buildStart":"2025-02-13"},"DC Enclosures, Inc.":{"id":"4239","hsId":"29675275418","dropbox":"","contacts":[{"n":"Tamara DeSantis","t":"Operations Manager","e":"tamarade@dcenclosures.com","p":"6785284946"}],"buildStart":"2025-02-19"},"BathHound":{"id":"4478","hsId":"47580838193","dropbox":"","contacts":[{"n":"Esi Medina","t":"GM","e":"esi.medina@bathhound.com","p":"7205467256"},{"n":"Jon Stucky","t":"","e":"jon.stucky@bathhound.com","p":""},{"n":"Heather Meyers","t":"Salesrep","e":"heather.meyers@bathhound.com","p":""}]}};
 const PS={Critical:{bg:"#dc2626",t:"#fff"},High:{bg:"#f97316",t:"#fff"},Medium:{bg:"#eab308",t:"#1a1a00"},Low:{bg:"#22c55e",t:"#fff"}};
 const SS={"Not Started":{bg:"#1f2937",t:"#9ca3af"},"In Progress - OCC":{bg:"#1e3a5f",t:"#60a5fa"},"In Progress - Customer":{bg:"#1a2e1a",t:"#4ade80"},"Completed":{bg:"#14532d",t:"#4ade80"},"Blocked":{bg:"#4a0000",t:"#f87171"},"":{bg:"#111827",t:"#4b5563"}};
 
@@ -365,16 +360,22 @@ ${cl.archived?'<div class="arch-banner">📁 Archived — '+stageLabel+'</div>':
     <div class="card-title-row">
       <span class="card-name">${cl.name}</span>
       ${cl.hs.id?`<span class="org-id">Org ${cl.hs.id}</span>`:''}
-      <button class="card-action-btn" onclick="navigator.clipboard&&navigator.clipboard.writeText(window.location.href)">Share Board</button>
+      <button class="card-action-btn" onclick="shareBoard(${gi})">Share Board</button>
     </div>
     <div class="card-tags">
       <span class="tag-occ">OCC</span>
       <span class="tag-pay" style="background:#14532d;color:#4ade80">Payments On</span>
     </div>
   </div>
-  <div style="display:flex;gap:7px">
-    <button class="card-action-btn">Links ▼</button>
-    <button class="card-action-btn">Contacts ▼</button>
+  <div style="display:flex;gap:7px;position:relative">
+    <div style="position:relative;display:inline-block">
+      <button class="card-action-btn" data-gi="${gi}" data-type="links" onclick="tgDD(this)">Links ▼</button>
+      <div id="dd-links-${gi}" style="display:none;position:absolute;right:0;top:100%;margin-top:4px;background:#1e2130;border:1px solid #374151;border-radius:8px;min-width:210px;z-index:200;overflow:hidden;box-shadow:0 8px 24px #00000088"></div>
+    </div>
+    <div style="position:relative;display:inline-block">
+      <button class="card-action-btn" data-gi="${gi}" data-type="contacts" onclick="tgDD(this)">Contacts ▼</button>
+      <div id="dd-contacts-${gi}" style="display:none;position:absolute;right:0;top:100%;margin-top:4px;background:#1e2130;border:1px solid #374151;border-radius:8px;min-width:270px;z-index:200;overflow:hidden;box-shadow:0 8px 24px #00000088"></div>
+    </div>
   </div>
 </div>
 <hr class="card-divider">
@@ -389,7 +390,7 @@ ${cl.archived?'<div class="arch-banner">📁 Archived — '+stageLabel+'</div>':
   </div>
   <div class="meta-block">
     <div class="meta-lbl">Build Time</div>
-    <div class="meta-val" style="color:#4ade80">${cl.hs.buildTime||"—"}</div>
+    <div class="meta-val" style="color:#4ade80">${(function(){var d=(EXTRAS[cl.name]||{}).buildStart;if(!d)return"—";var p=d.split("-");var start=new Date(+p[0],+p[1]-1,+p[2]);var today=new Date();today=new Date(today.getFullYear(),today.getMonth(),today.getDate());var days=Math.round((today-start)/86400000);return days+" day"+(days!==1?"s":"");}())}</div>
   </div>
   <div class="meta-block">
     <div class="meta-lbl">Account Manager</div>
@@ -434,7 +435,7 @@ ${cl.onboarder?`<div class="meta-lbl" style="margin-bottom:5px">Onboarded By</di
             h+=`<tr style="background:${task.complete?"#0a0e17":"#111827"};opacity:${task.complete?.55:1}">
 <td style="text-align:center;padding:5px 3px"><div class="ck${task.complete?" dk":""}" onclick="tgT(${gi},${pi},${ti})">${task.complete?`<span style="font-size:7px;color:#fff">✓</span>`:""}</div></td>
 <td style="text-align:center;padding:5px 2px"><button class="del-btn" onclick="delT(${gi},${pi},${ti})" title="Delete task">🗑</button></td>
-<td style="text-decoration:${task.complete?"line-through":"none"};font-size:11px">${task.task}</td>
+<td style="padding:2px 4px"><input value="${task.task.replace(/"/g,'&quot;')}" style="background:transparent;border:none;border-bottom:1px solid transparent;font-size:11px;color:#e5e7eb;width:100%;outline:none;text-decoration:${task.complete?'line-through':'none'};padding:1px 2px" onfocus="this.style.borderBottomColor='#4f46e5'" onblur="this.style.borderBottomColor='transparent';updTN(${gi},${pi},${ti},this.value)" onkeydown="if(event.key==='Enter')this.blur()"></td>
 <td style="padding:3px 5px"><div style="background:${ps.bg};border-radius:5px;overflow:hidden"><select style="background:${ps.bg};color:${ps.t};border:none;font-weight:700;font-size:11px;padding:2px 5px;width:100%;outline:none;cursor:pointer" onchange="updP(${gi},${pi},${ti},this.value)">${prSel}</select></div></td>
 <td style="padding:3px 5px"><div class="sel-wrap"><select style="background:${ss.bg};color:${ss.t};border-color:#374151" onchange="updS(${gi},${pi},${ti},this.value)">${stSel}</select></div></td>
 <td style="padding:3px 5px">${occDL}<input list="occ-dl-${gi}-${pi}-${ti}" value="${task.occ||''}" placeholder="— assign —" style="font-size:11px;padding:2px 5px;background:#1a2030;border:1px solid #374151;border-radius:5px;color:#a78bfa;width:100%;outline:none" oninput="updO(${gi},${pi},${ti},this.value)"></td>
@@ -466,7 +467,124 @@ function setSt(s){stf=s;si=0;render();}
 function sv(v){view=v;document.getElementById("bInt").className="vb"+(v==="internal"?" va":"");document.getElementById("bCli").className="vb"+(v==="client"?" va":"");renderMain();}
 function setTab(t){tab=t;renderMain();}
 function toggleArch(){showArch=!showArch;si=0;of="All";af="All";stf="All";render();}
+
+function shareBoard(gi){
+  var fcs=fc();
+  var cl=fcs[Math.min(gi,fcs.length-1)];
+  if(!cl)return;
+  var base=window.location.origin+window.location.pathname;
+  var url=base+'?share='+encodeURIComponent(cl.name);
+  navigator.clipboard&&navigator.clipboard.writeText(url).then(function(){
+    var btn=document.querySelector('[onclick="shareBoard('+gi+')"]');
+    if(btn){var orig=btn.textContent;btn.textContent='✓ Copied!';btn.style.background='#14532d';btn.style.color='#4ade80';btn.style.borderColor='#4ade80';setTimeout(function(){btn.textContent=orig;btn.style.background='';btn.style.color='';btn.style.borderColor='';},2000);}
+  });
+}
+
+// ── Share mode: render a locked read-only view of a single client ─────────
+(function(){
+  var params=new URLSearchParams(window.location.search);
+  var shareName=params.get('share');
+  if(!shareName)return;
+  // Hide sidebar, lock to this client
+  document.addEventListener('DOMContentLoaded',function(){
+    var sidebar=document.querySelector('.sidebar');
+    if(sidebar)sidebar.style.display='none';
+    var main=document.querySelector('.main');
+    if(main){main.style.marginLeft='0';main.style.width='100vw';}
+    // Find client in DATA and render read-only
+    var all=DATA||[];
+    var cl=all.find(function(c){return c.name===shareName;});
+    if(!cl){document.querySelector('.main').innerHTML='<div style="padding:40px;color:#9ca3af;font-size:14px">Board not found.</div>';return;}
+    // Set si to this client's index, lock filters, force internal view, re-render
+    si=all.indexOf(cl);
+    of='All';af='All';stf='All';
+    render();
+    // After render, disable all interactive editing elements
+    setTimeout(function(){
+      // Hide edit controls, trash buttons, add-task buttons
+      document.querySelectorAll('.add-task-row,input[type=checkbox],.del-btn,.priority-sel,.status-sel,.assigned-sel,.goal-date-inp').forEach(function(el){el.style.display='none';});
+      // Make task names non-editable
+      document.querySelectorAll('.task-name-inp').forEach(function(el){el.readOnly=true;el.style.background='transparent';el.style.cursor='default';});
+      // Add read-only banner
+      var banner=document.createElement('div');
+      banner.style.cssText='position:fixed;top:0;left:0;right:0;background:#1e1b4b;border-bottom:1px solid #4f46e5;padding:7px 16px;font-size:11px;color:#a5b4fc;z-index:999;display:flex;align-items:center;justify-content:space-between;';
+      banner.innerHTML='<span>👁 View-only · <strong style="color:#f9fafb">'+shareName+'</strong></span><span style="color:#4b5563">OCC Onboarding Portal</span>';
+      document.body.prepend(banner);
+      // Push content down
+      var main=document.querySelector('.main');
+      if(main)main.style.paddingTop='34px';
+    },100);
+  });
+}());
 document.getElementById("srch").addEventListener("input",e=>{srch=e.target.value;si=0;render();});
+function ddLinkHTML(gi){
+  const fcs=fc();
+  const cl=fcs[Math.min(si,Math.max(0,fcs.length-1))];
+  const ex=EXTRAS[cl.name]||{};
+  const links=[
+    {lbl:"Dropbox",url:ex.dropbox||""},
+    {lbl:"Gong",url:ex.gong||""},
+    {lbl:"OCC Site",url:ex.id?"https://app.remotesf.com/v2/orgs/"+ex.id+"/info":""},
+    {lbl:"HubSpot",url:ex.hsId?"https://app.hubspot.com/contacts/4136968/record/0-2/"+ex.hsId:""}
+  ];
+  var html="";
+  for(var i=0;i<links.length;i++){
+    var l=links[i];
+    if(l.url){
+      html+="<a href=\""+l.url+"\" target=\"_blank\" style=\"display:block;padding:8px 14px;font-size:12px;color:#e5e7eb;text-decoration:none;border-bottom:1px solid #1f2937\" onmouseover=\"this.style.background='#1a2030'\" onmouseout=\"this.style.background=''\">"+l.lbl+"</a>";
+    } else {
+      html+="<span style=\"display:block;padding:8px 14px;font-size:12px;color:#4b5563;border-bottom:1px solid #1f2937\">"+l.lbl+" <span style=\"font-size:10px\">(not set)</span></span>";
+    }
+  }
+  return html;
+}
+function ddContactHTML(gi){
+  const fcs=fc();
+  const cl=fcs[Math.min(si,Math.max(0,fcs.length-1))];
+  const ex=EXTRAS[cl.name]||{};
+  const contacts=ex.contacts||[];
+  if(!contacts.length){return "<div style=\"padding:12px 14px;font-size:12px;color:#4b5563\">No contacts on file</div>";}
+  var html="";
+  for(var i=0;i<contacts.length;i++){
+    var c=contacts[i];
+    var ini2=(c.n||"?").split(" ").map(function(w){return w[0];}).join("").slice(0,2).toUpperCase();
+    var bg=ac(c.n);
+    var hsLink=c.hsContactId?"https://app.hubspot.com/contacts/4136968/record/0-1/"+c.hsContactId:"";
+    html+="<div style=\"display:flex;align-items:flex-start;gap:9px;padding:9px 14px;border-bottom:1px solid #1f2937\">";
+    html+="<div style=\"width:28px;height:28px;border-radius:50%;background:"+bg+";display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:800;color:#fff;flex-shrink:0\">"+ini2+"</div>";
+    html+="<div style=\"min-width:0;flex:1\">";
+    if(hsLink){
+      html+="<a href=\""+hsLink+"\" target=\"_blank\" style=\"font-size:12px;font-weight:700;color:#f9fafb;text-decoration:none\" onmouseover=\"this.style.color='#f97316'\" onmouseout=\"this.style.color='#f9fafb'\">"+c.n+" <span style=\"font-size:9px;opacity:0.6\">↗</span></a>";
+    } else {
+      html+="<div style=\"font-size:12px;font-weight:700;color:#f9fafb\">"+c.n+"</div>";
+    }
+    if(c.t){html+="<div style=\"font-size:10px;color:#6b7280\">"+c.t+"</div>";}
+    if(c.e){html+="<a href=\"mailto:"+c.e+"\" style=\"font-size:10px;color:#60a5fa;text-decoration:none;display:block\">"+c.e+"</a>";}
+    if(c.p){html+="<div style=\"font-size:10px;color:#9ca3af\">"+c.p+"</div>";}
+    html+="</div></div>";
+  }
+  return html;
+}
+function tgDD(btn){
+  const gi=parseInt(btn.dataset.gi);
+  const type=btn.dataset.type;
+  const id="dd-"+type+"-"+gi;
+  document.querySelectorAll('[id^="dd-links-"],[id^="dd-contacts-"]').forEach(function(el){if(el.id!==id)el.style.display="none";});
+  const el=document.getElementById(id);
+  if(!el)return;
+  const isOpen=el.style.display==="block";
+  if(!isOpen){
+    if(type==="links")el.innerHTML=ddLinkHTML(gi);
+    else el.innerHTML=ddContactHTML(gi);
+  }
+  el.style.display=isOpen?"none":"block";
+}
+document.addEventListener("click",function(e){
+  if(!e.target.closest(".card-action-btn")&&!e.target.closest('[id^="dd-links-"],[id^="dd-contacts-"]')){
+    document.querySelectorAll('[id^="dd-links-"],[id^="dd-contacts-"]').forEach(el=>el.style.display="none");
+  }
+});
+function updTN(gi,pi,ti,v){phases[gi][pi].tasks[ti].task=v;}
 function tgP(gi,pi){phases[gi][pi].open=!phases[gi][pi].open;renderMain();}
 function tgT(gi,pi,ti){
   const t=phases[gi][pi].tasks[ti];
