@@ -6,9 +6,9 @@
 <title>OCC Onboarding Portal</title>
 <style>
 *{box-sizing:border-box;margin:0;padding:0}
-body{background:#1c1917;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;min-height:100vh;display:flex;align-items:flex-start;justify-content:center;padding:20px}
-.portal{display:flex;height:760px;overflow:hidden;border:1px solid #1f2937;border-radius:12px;background:#1c1917;width:100%;max-width:1300px}
-.sidebar{width:230px;border-right:1px solid #1f2937;display:flex;flex-direction:column;background:#13110f;flex-shrink:0}
+html,body{height:100%;margin:0;padding:0}body{background:#1c1917;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;height:100vh;display:flex;flex-direction:column}
+.portal{display:flex;height:100vh;overflow:hidden;background:#1c1917;width:100%;flex:1}
+.sidebar{width:260px;border-right:1px solid #1f2937;display:flex;flex-direction:column;background:#13110f;flex-shrink:0}
 .sb-top{padding:10px 10px 8px;border-bottom:1px solid #1f2937}
 .sb-label{font-size:9px;font-weight:700;color:#4b5563;text-transform:uppercase;letter-spacing:.07em;margin-bottom:5px}
 .search{width:100%;font-size:11px;padding:4px 7px;background:#1c1917;border:1px solid #374151;border-radius:6px;color:#f9fafb;outline:none;margin-bottom:7px}
@@ -65,6 +65,28 @@ td{padding:5px 7px;border-bottom:1px solid #1a2030;vertical-align:middle;font-si
 .exb.hc{background:#1e293b;border-color:#2d4a7a}
 .pr{font-size:11px;font-weight:500;padding:2px 8px;border-radius:4px;text-align:center;display:inline-block}
 .st{font-size:11px;font-weight:500;padding:2px 7px;border-radius:4px;text-align:center;display:inline-block;white-space:nowrap}
+.sel-wrap select{font-size:11px;padding:2px 5px;border-radius:5px;border:1px solid #374151;background:#1a2030;color:#f9fafb;cursor:pointer;outline:none;width:100%}
+.sel-wrap select:focus{border-color:#4f46e5}
+.del-btn{width:18px;height:18px;border-radius:3px;border:1px solid #374151;background:transparent;cursor:pointer;display:flex;align-items:center;justify-content:center;color:#4b5563;font-size:11px;flex-shrink:0;padding:0}
+.del-btn:hover{background:#3b1111;border-color:#ef4444;color:#ef4444}
+.card-top{display:flex;align-items:flex-start;justify-content:space-between;gap:10px;margin-bottom:10px}
+.card-title-row{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+.card-name{font-size:18px;font-weight:800;color:#f9fafb}
+.org-id{font-size:11px;font-weight:700;color:#f59e0b;background:#f59e0b18;border:1px solid #f59e0b40;border-radius:5px;padding:2px 8px}
+.card-action-btn{font-size:11px;font-weight:600;color:#d1d5db;background:#1f2937;border:1px solid #374151;border-radius:6px;padding:4px 10px;cursor:pointer}
+.card-action-btn:hover{background:#374151}
+.card-tags{display:flex;gap:7px;flex-wrap:wrap;margin:7px 0 10px 0}
+.tag-occ{font-size:11px;font-weight:700;background:#4c1d95;color:#a78bfa;border-radius:5px;padding:3px 9px}
+.tag-pay{font-size:11px;font-weight:700;background:#14532d;color:#4ade80;border-radius:5px;padding:3px 9px}
+.card-meta{display:grid;grid-template-columns:repeat(4,auto);gap:18px;margin:6px 0 10px 0;align-items:start}
+.meta-block{display:flex;flex-direction:column;gap:2px}
+.meta-lbl{font-size:9px;font-weight:700;color:#4b5563;letter-spacing:.08em;text-transform:uppercase}
+.meta-val{font-size:12px;font-weight:700;color:#f9fafb}
+.meta-sub{font-size:10px;color:#6b7280}
+.meta-av{width:22px;height:22px;border-radius:50%;display:inline-flex;align-items:center;justify-content:center;font-size:9px;font-weight:800;color:#fff;margin-right:5px;flex-shrink:0}
+.meta-person{display:flex;align-items:center;gap:0}
+.card-divider{border:none;border-top:1px solid #1f2937;margin:0 0 10px 0}
+.onb-row{display:flex;align-items:center;gap:8px;margin-bottom:8px}
 .cmt-row td{background:#0a0e17;padding:6px 10px 8px 26px}
 .cmt-lbl{font-size:9px;font-weight:700;color:#4b5563;text-transform:uppercase;letter-spacing:.07em;margin-bottom:3px}
 textarea{width:100%;font-size:11px;padding:5px 8px;background:#111827;border:1px solid #374151;border-radius:5px;color:#f9fafb;resize:vertical;outline:none;font-family:inherit}
@@ -89,9 +111,22 @@ textarea{width:100%;font-size:11px;padding:5px 8px;background:#111827;border:1px
 .atn{font-size:11px;font-weight:600;color:#f9fafb}
 .ats{font-size:10px;color:#6b7280}
 .arch-banner{background:#1a1226;border:1px solid #4c1d95;border-radius:8px;padding:10px 14px;margin-bottom:14px;font-size:11px;color:#a78bfa}
+
+.modal-overlay{display:none;position:fixed;inset:0;background:#00000099;z-index:1000;align-items:center;justify-content:center}
+.modal-overlay.show{display:flex}
+.modal-box{background:#1e2130;border:1px solid #374151;border-radius:10px;padding:22px 24px;min-width:300px;max-width:380px;box-shadow:0 8px 32px #00000088}
+.modal-title{font-size:13px;font-weight:700;color:#f9fafb;margin-bottom:8px}
+.modal-msg{font-size:11px;color:#9ca3af;margin-bottom:18px;line-height:1.5}
+.modal-task{font-size:12px;font-weight:600;color:#a78bfa;background:#1a1226;padding:5px 9px;border-radius:6px;margin-bottom:16px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.modal-btns{display:flex;gap:8px;justify-content:flex-end}
+.modal-btn{font-size:12px;font-weight:600;padding:6px 16px;border-radius:6px;cursor:pointer;border:1px solid}
+.modal-cancel{background:transparent;color:#9ca3af;border-color:#374151}
+.modal-cancel:hover{background:#1f2937;color:#f9fafb}
+.modal-confirm{background:#7f1d1d;color:#fca5a5;border-color:#ef4444}
+.modal-confirm:hover{background:#ef4444;color:#fff}
 </style>
 </head>
-<body>
+<body style="margin:0;padding:0;height:100vh;overflow:hidden">
 <div class="portal">
 <div class="sidebar">
   <div class="sb-top">
@@ -130,6 +165,17 @@ textarea{width:100%;font-size:11px;padding:5px 8px;background:#111827;border:1px
 </div>
 </div>
 
+<div class="modal-overlay" id="delModal">
+  <div class="modal-box">
+    <div class="modal-title">🗑 Delete Task</div>
+    <div class="modal-msg">Are you sure you want to delete this task? This cannot be undone.</div>
+    <div class="modal-task" id="delModalName"></div>
+    <div class="modal-btns">
+      <button class="modal-btn modal-cancel" onclick="closeDelModal()">Cancel</button>
+      <button class="modal-btn modal-confirm" onclick="confirmDel()">Delete</button>
+    </div>
+  </div>
+</div>
 <script>
 const SM={
   driving_utilization:{l:"Driving Utilization",c:"#f472b6"},
@@ -147,18 +193,18 @@ const SM={
 };
 const ACTIVE_STAGES=new Set(["paid","waiting_on_materials","build_in_progress","build_completed","training_scheduled","driving_utilization"]);
 const OM={46491757:"Paul Gervasi",81817361:"Nico Valenzuela",173758648:"Philip Jacobs",173757457:"Taylor Mastin",495868686:"Chance Ray",644465735:"Alan May",116399656:"Chad Hunt",1592156152:"Josh Tazzetta",63601710:"Jesse Mayek",51013924:"Levi Bond",83451467:"Cara Landolt"};
-const PS={Critical:{bg:"#F28B82",t:"#4A1B0C"},High:{bg:"#F4A261",t:"#412402"},Medium:{bg:"#E9C46A",t:"#412402"},Low:{bg:"#C8D97A",t:"#173404"}};
+const PS={Critical:{bg:"#dc2626",t:"#fff"},High:{bg:"#f97316",t:"#fff"},Medium:{bg:"#eab308",t:"#1a1a00"},Low:{bg:"#22c55e",t:"#fff"}};
 const SS={"Not Started":{bg:"#1f2937",t:"#9ca3af"},"In Progress - OCC":{bg:"#1e3a5f",t:"#60a5fa"},"In Progress - Customer":{bg:"#1a2e1a",t:"#4ade80"},"Completed":{bg:"#14532d",t:"#4ade80"},"Blocked":{bg:"#4a0000",t:"#f87171"},"":{bg:"#111827",t:"#4b5563"}};
 
 const PT=[
-  {id:"kd",label:"Key Drivers",color:"#F97316",tasks:[{task:"Key Driver 1",priority:"Critical",status:"",comment:"",_open:false,complete:false},{task:"Key Driver 2",priority:"Critical",status:"",comment:"",_open:false,complete:false},{task:"Key Driver 3",priority:"Critical",status:"",comment:"",_open:false,complete:false}]},
-  {id:"p2d",label:"Meetings",color:"#16A34A",tasks:[]},
-  {id:"p1a",label:"Phase 1a – Introduction",color:"#EF4444",tasks:[{task:"Intro Call Scheduled",priority:"Critical",status:"In Progress - OCC",comment:"",_open:false,complete:false},{task:"Intro Call Follow Up Email",priority:"Critical",status:"In Progress - OCC",comment:"",_open:false,complete:false},{task:"Ideal Go Live Date",priority:"Critical",status:"In Progress - OCC",comment:"",_open:false,complete:false}]},
-  {id:"p1b",label:"Phase 1b – Materials Gathering",color:"#F59E0B",tasks:[{task:"Priority 1 Pricing Materials",priority:"Critical",status:"In Progress - Customer",comment:"",_open:false,complete:false},{task:"Contract(s)",priority:"Critical",status:"In Progress - Customer",comment:"",_open:false,complete:false},{task:"Send user list",priority:"Critical",status:"In Progress - Customer",comment:"",_open:false,complete:false},{task:"OCC Payments",priority:"High",status:"In Progress - Customer",comment:"",_open:false,complete:false}]},
-  {id:"p2a",label:"Phase 2a – Price List Building",color:"#EAB308",tasks:[{task:"Priority 1 Vertical",priority:"Critical",status:"Not Started",comment:"",_open:false,complete:false},{task:"Priority 2 Vertical",priority:"High",status:"Not Started",comment:"",_open:false,complete:false}]},
-  {id:"p2b",label:"Phase 2b – Document Coding",color:"#84CC16",tasks:[{task:"Contract(s) Coded",priority:"High",status:"Not Started",comment:"",_open:false,complete:false},{task:"Fillable Documents",priority:"Medium",status:"Not Started",comment:"",_open:false,complete:false}]},
-  {id:"p2c",label:"Phase 2c – Platform Config",color:"#22C55E",tasks:[{task:"Integrations",priority:"Medium",status:"Not Started",comment:"",_open:false,complete:false},{task:"Payment Terms",priority:"High",status:"Not Started",comment:"",_open:false,complete:false},{task:"Discounts",priority:"Low",status:"Not Started",comment:"",_open:false,complete:false}]},
-  {id:"p3",label:"Phase 3 – Go Live!",color:"#15803D",tasks:[{task:"Final Feedback Meeting",priority:"Critical",status:"Not Started",comment:"",_open:false,complete:false},{task:"Build Sign Off",priority:"Critical",status:"",comment:"",_open:false,complete:false},{task:"Sales Team Training",priority:"Critical",status:"Not Started",comment:"",_open:false,complete:false}]}
+  {id:"kd",label:"Key Drivers",color:"#ef4444",tasks:[{task:"Key Driver 1",priority:"Critical",status:"",occ:"",goalDate:"",completedDate:"",comment:"",_open:false,complete:false},{task:"Key Driver 2",priority:"Critical",status:"",occ:"",goalDate:"",completedDate:"",comment:"",_open:false,complete:false},{task:"Key Driver 3",priority:"Critical",status:"",occ:"",goalDate:"",completedDate:"",comment:"",_open:false,complete:false}]},
+  {id:"p2d",label:"Meetings",color:"#f97316",tasks:[]},
+  {id:"p1a",label:"Phase 1a – Introduction",color:"#f59e0b",tasks:[{task:"Intro Call Scheduled",priority:"Critical",status:"In Progress - OCC",occ:"",goalDate:"",completedDate:"",comment:"",_open:false,complete:false},{task:"Intro Call Follow Up Email",priority:"Critical",status:"In Progress - OCC",occ:"",goalDate:"",completedDate:"",comment:"",_open:false,complete:false},{task:"Ideal Go Live Date",priority:"Critical",status:"In Progress - OCC",occ:"",goalDate:"",completedDate:"",comment:"",_open:false,complete:false}]},
+  {id:"p1b",label:"Phase 1b – Materials Gathering",color:"#eab308",tasks:[{task:"Priority 1 Pricing Materials",priority:"Critical",status:"In Progress - Customer",occ:"",goalDate:"",completedDate:"",comment:"",_open:false,complete:false},{task:"Contract(s)",priority:"Critical",status:"In Progress - Customer",occ:"",goalDate:"",completedDate:"",comment:"",_open:false,complete:false},{task:"Send user list",priority:"Critical",status:"In Progress - Customer",occ:"",goalDate:"",completedDate:"",comment:"",_open:false,complete:false},{task:"OCC Payments",priority:"High",status:"In Progress - Customer",occ:"",goalDate:"",completedDate:"",comment:"",_open:false,complete:false}]},
+  {id:"p2a",label:"Phase 2a – Price List Building",color:"#84cc16",tasks:[{task:"Priority 1 Vertical",priority:"Critical",status:"Not Started",occ:"",goalDate:"",completedDate:"",comment:"",_open:false,complete:false},{task:"Priority 2 Vertical",priority:"High",status:"Not Started",occ:"",goalDate:"",completedDate:"",comment:"",_open:false,complete:false}]},
+  {id:"p2b",label:"Phase 2b – Document Coding",color:"#22c55e",tasks:[{task:"Contract(s) Coded",priority:"High",status:"Not Started",occ:"",goalDate:"",completedDate:"",comment:"",_open:false,complete:false},{task:"Fillable Documents",priority:"Medium",status:"Not Started",occ:"",goalDate:"",completedDate:"",comment:"",_open:false,complete:false}]},
+  {id:"p2c",label:"Phase 2c – Platform Config",color:"#16a34a",tasks:[{task:"Integrations",priority:"Medium",status:"Not Started",occ:"",goalDate:"",completedDate:"",comment:"",_open:false,complete:false},{task:"Payment Terms",priority:"High",status:"Not Started",occ:"",goalDate:"",completedDate:"",comment:"",_open:false,complete:false},{task:"Discounts",priority:"Low",status:"Not Started",occ:"",goalDate:"",completedDate:"",comment:"",_open:false,complete:false}]},
+  {id:"p3",label:"Phase 3 – Go Live!",color:"#15803d",tasks:[{task:"Final Feedback Meeting",priority:"Critical",status:"Not Started",occ:"",goalDate:"",completedDate:"",comment:"",_open:false,complete:false},{task:"Build Sign Off",priority:"Critical",status:"",occ:"",goalDate:"",completedDate:"",comment:"",_open:false,complete:false},{task:"Sales Team Training",priority:"Critical",status:"Not Started",occ:"",goalDate:"",completedDate:"",comment:"",_open:false,complete:false}]}
 ];
 
 // === LIVE CLIENT DATA (synced Mar 13, 2026) ===
@@ -307,7 +353,64 @@ function renderMain(){
   let h="";
 
   if(tab==="board"){
-    h+=`<div class="card">${cl.archived?'<div class="arch-banner">📁 Archived — '+st.l+'</div>':''}<div class="cname">${cl.name}</div><div class="cbadges">${cl.onboarder?`<span class="bdg" style="color:#a78bfa;border-color:#4c1d95;background:#4c1d9520">👤 ${cl.onboarder}</span>`:''}<span class="bdg" style="color:${st?st.c:"#9ca3af"};border-color:${st?st.c+"50":"#374151"};background:${st?st.c+"15":"#1f293730"}">${st?st.l:"—"}</span><span class="bdg" style="color:#9ca3af;border-color:#374151;background:#1f293730">AM: ${am}</span>${cl.hs.seats&&cl.hs.seats!=="0"?`<span class="bdg" style="color:#a78bfa;border-color:#4c1d95;background:#4c1d9520">${cl.hs.seats} seats</span>`:""}</div></div>`;
+    const amName=OM[cl.hs.am]||"—";
+    const amIni=amName.split(" ").map(w=>w[0]).join("").slice(0,2).toUpperCase();
+    const onbIni=cl.onboarder?cl.onboarder.split(" ").map(w=>w[0]).join("").slice(0,2).toUpperCase():"?";
+    const stColor=st?st.c:"#9ca3af";
+    const stageLabel=st?st.l:"—";
+    h+=`<div class="card">
+${cl.archived?'<div class="arch-banner">📁 Archived — '+stageLabel+'</div>':''}
+<div class="card-top">
+  <div>
+    <div class="card-title-row">
+      <span class="card-name">${cl.name}</span>
+      ${cl.hs.id?`<span class="org-id">Org ${cl.hs.id}</span>`:''}
+      <button class="card-action-btn" onclick="navigator.clipboard&&navigator.clipboard.writeText(window.location.href)">Share Board</button>
+    </div>
+    <div class="card-tags">
+      <span class="tag-occ">OCC</span>
+      <span class="tag-pay" style="background:#14532d;color:#4ade80">Payments On</span>
+    </div>
+  </div>
+  <div style="display:flex;gap:7px">
+    <button class="card-action-btn">Links ▼</button>
+    <button class="card-action-btn">Contacts ▼</button>
+  </div>
+</div>
+<hr class="card-divider">
+<div class="card-meta">
+  <div class="meta-block">
+    <div class="meta-lbl">Status</div>
+    <div class="meta-val" style="color:${stColor}">${stageLabel}</div>
+  </div>
+  <div class="meta-block">
+    <div class="meta-lbl">Seats</div>
+    <div class="meta-val">${cl.hs.seats||"—"}</div>
+  </div>
+  <div class="meta-block">
+    <div class="meta-lbl">Build Time</div>
+    <div class="meta-val" style="color:#4ade80">${cl.hs.buildTime||"—"}</div>
+  </div>
+  <div class="meta-block">
+    <div class="meta-lbl">Account Manager</div>
+    <div class="meta-person">
+      <div class="meta-av" style="background:${ac(amName)}">${amIni}</div>
+      <div>
+        <div class="meta-val" style="font-size:12px">${amName}</div>
+        <div class="meta-sub">${cl.hs.amEmail||""}</div>
+      </div>
+    </div>
+  </div>
+</div>
+${cl.onboarder?`<div class="meta-lbl" style="margin-bottom:5px">Onboarded By</div>
+<div class="onb-row">
+  <div class="meta-av" style="background:${ac(cl.onboarder)}">${onbIni}</div>
+  <div>
+    <div class="meta-val" style="font-size:12px">${cl.onboarder}</div>
+    <div class="meta-sub">${cl.hs.onbEmail||""}</div>
+  </div>
+</div>`:''}
+</div>`;
     ph.forEach((phase,pi)=>{
       const dnt=phase.id==="p2d"?0:phase.tasks.filter(t=>t.complete||t.status==="Completed").length;
       h+=`<div><div class="ph-hdr" onclick="tgP(${gi},${pi})"><span class="ph-arr" style="color:${phase.color}">${phase.open?"▼":"▶"}</span><span class="ph-lbl" style="color:${phase.color}">${phase.label}</span><span class="ph-cnt">${phase.id==="p2d"?`(${cl.meetings.length} meeting${cl.meetings.length!==1?"s":""})`:`(${dnt}/${phase.tasks.length})`}</span></div>`;
@@ -318,13 +421,29 @@ function renderMain(){
           else{cl.meetings.forEach((m,mi)=>{const atts=m.att||[];h+=`<div class="mr" onclick="tgM('bm${gi}-${mi}','ba${gi}-${mi}')"><div class="mri"><div class="mdate">${m.date}</div><div style="flex:1;display:flex;align-items:center;gap:7px;min-width:0"><span class="mtitle">${m.title}</span><span class="msrc ${m.src==="gong"?"gb":"zb"}">${m.src==="gong"?"Gong":"Zoom"}</span></div><div class="mdur">${m.dur}</div><div class="avrow">${atts.slice(0,3).map((a,i)=>`<div class="av" style="background:${ac(a.n)};margin-left:${i?"-5px":"0"}">${ini(a.n)}</div>`).join("")}${atts.length>3?`<div class="av" style="background:#374151;margin-left:-5px">+${atts.length-3}</div>`:""}</div><div id="ba${gi}-${mi}" style="font-size:9px;color:#374151;width:18px;text-align:center">▼</div></div><div class="mexp" id="bm${gi}-${mi}"><div class="ahhdr">Attendees · ${atts.length}</div>${atts.map(a=>`<div class="atrow"><div class="atav" style="background:${ac(a.n)}">${ini(a.n)}</div><div><div class="atn">${a.n}</div><div class="ats">${[a.t,a.e].filter(Boolean).join(" · ")}</div></div></div>`).join("")}${!atts.length?'<div style="font-size:11px;color:#4b5563;font-style:italic">No attendee data.</div>':""}</div></div>`;})}
           h+=`</div>`;
         }else{
-          h+=`<div class="tw"><table><colgroup><col style="width:22px"><col style="width:28%"><col style="width:90px"><col style="width:130px"><col style="width:90px"><col style="width:22px"></colgroup><thead><tr><th></th><th>Task</th><th style="text-align:center">Priority</th><th style="text-align:center">Status</th><th style="text-align:center">Timeline</th><th></th></tr></thead><tbody>`;
+          h+=`<div class="tw"><table><colgroup><col style="width:22px"><col style="width:20px"><col style="width:22%"><col style="width:95px"><col style="width:140px"><col style="width:100px"><col style="width:100px"><col style="width:95px"><col style="width:22px"></colgroup><thead><tr><th></th><th></th><th>Task</th><th style="text-align:center">Priority</th><th style="text-align:center">Status</th><th style="text-align:center">Assigned To</th><th style="text-align:center">Goal Date</th><th style="text-align:center">Completed</th><th></th></tr></thead><tbody>`;
           phase.tasks.forEach((task,ti)=>{
             const ps=PS[task.priority]||PS.Medium;const ss=SS[task.status]||SS[""];
-            h+=`<tr style="background:${task.complete?"#0a0e17":"#111827"};opacity:${task.complete?.55:1}"><td style="text-align:center;padding:5px 3px"><div class="ck${task.complete?" dk":""}" onclick="tgT(${gi},${pi},${ti})">${task.complete?`<span style="font-size:7px;color:#fff">✓</span>`:""}</div></td><td style="text-decoration:${task.complete?"line-through":"none"}">${task.task}</td><td style="text-align:center"><span class="pr" style="background:${ps.bg};color:${ps.t}">${task.priority}</span></td><td style="text-align:center"><span class="st" style="background:${ss.bg};color:${ss.t}">${task.status||"–"}</span></td><td style="text-align:center;font-size:10px;color:#4b5563">–</td><td style="text-align:center;padding:5px 3px"><div class="exb${task.comment?" hc":""}" onclick="tgC(${gi},${pi},${ti})"><span style="font-size:6px;color:${task.comment?"#60a5fa":"#4b5563"}">${task._open?"▲":"▼"}</span></div></td></tr>`;
-            if(task._open){h+=`<tr class="cmt-row"><td colspan="6"><div class="cmt-lbl">Comment</div><textarea rows="2" placeholder="Add a comment..." onchange="updC(${gi},${pi},${ti},this.value)">${task.comment||""}</textarea></td></tr>`;}
+            const occOpts=["Paul Gervasi","Philip Jacobs","Nico Valenzuela","Taylor Mastin","Levi Bond","Cara Landolt","Chad Hunt","Jesse Mayek","Josh Tazzetta","Chance Ray","Alan May"];
+            const prOpts=["Critical","High","Medium","Low"];
+            const stOpts=["","Not Started","In Progress - OCC","In Progress - Customer","Completed","Blocked"];
+            const prSel=prOpts.map(o=>`<option value="${o}"${task.priority===o?" selected":""} style="background:#1e2130;color:#f9fafb">${o}</option>`).join("");
+            const stSel=stOpts.map(o=>`<option value="${o}"${task.status===o?" selected":""} style="background:#1e2130;color:#f9fafb">${o||"— set status —"}</option>`).join("");
+            const occDL=`<datalist id="occ-dl-${gi}-${pi}-${ti}">`+occOpts.map(o=>`<option value="${o}">`).join("")+`</datalist>`;
+            const isOverdue=task.goalDate&&!task.complete&&new Date(task.goalDate)<new Date();
+            h+=`<tr style="background:${task.complete?"#0a0e17":"#111827"};opacity:${task.complete?.55:1}">
+<td style="text-align:center;padding:5px 3px"><div class="ck${task.complete?" dk":""}" onclick="tgT(${gi},${pi},${ti})">${task.complete?`<span style="font-size:7px;color:#fff">✓</span>`:""}</div></td>
+<td style="text-align:center;padding:5px 2px"><button class="del-btn" onclick="delT(${gi},${pi},${ti})" title="Delete task">🗑</button></td>
+<td style="text-decoration:${task.complete?"line-through":"none"};font-size:11px">${task.task}</td>
+<td style="padding:3px 5px"><div style="background:${ps.bg};border-radius:5px;overflow:hidden"><select style="background:${ps.bg};color:${ps.t};border:none;font-weight:700;font-size:11px;padding:2px 5px;width:100%;outline:none;cursor:pointer" onchange="updP(${gi},${pi},${ti},this.value)">${prSel}</select></div></td>
+<td style="padding:3px 5px"><div class="sel-wrap"><select style="background:${ss.bg};color:${ss.t};border-color:#374151" onchange="updS(${gi},${pi},${ti},this.value)">${stSel}</select></div></td>
+<td style="padding:3px 5px">${occDL}<input list="occ-dl-${gi}-${pi}-${ti}" value="${task.occ||''}" placeholder="— assign —" style="font-size:11px;padding:2px 5px;background:#1a2030;border:1px solid #374151;border-radius:5px;color:#a78bfa;width:100%;outline:none" oninput="updO(${gi},${pi},${ti},this.value)"></td>
+<td style="padding:3px 5px;text-align:center"><input type="date" value="${task.goalDate||""}" style="font-size:10px;padding:2px 4px;background:#1a2030;border:1px solid ${isOverdue?"#ef4444":"#374151"};border-radius:5px;color:${isOverdue?"#ef4444":"#9ca3af"};width:100%;outline:none;cursor:pointer" onchange="updGD(${gi},${pi},${ti},this.value)"></td>
+<td style="padding:3px 7px;text-align:center;font-size:10px;color:${task.completedDate?"#4ade80":"#374151"}">${task.completedDate||"—"}</td>
+<td style="text-align:center;padding:5px 3px"><div class="exb${task.comment?" hc":""}" onclick="tgC(${gi},${pi},${ti})"><span style="font-size:6px;color:${task.comment?"#60a5fa":"#4b5563"}">${task._open?"▲":"▼"}</span></div></td></tr>`;
+            if(task._open){h+=`<tr class="cmt-row"><td colspan="9"><div class="cmt-lbl">Comment</div><textarea rows="2" placeholder="Add a comment..." onchange="updC(${gi},${pi},${ti},this.value)">${task.comment||""}</textarea></td></tr>`;}
           });
-          if(!isC){h+=`<tr><td colspan="6"><span class="addrow" onclick="addT(${gi},${pi})">+ Add task</span></td></tr>`;}
+          if(!isC){h+=`<tr><td colspan="9"><span class="addrow" onclick="addT(${gi},${pi})">+ Add task</span></td></tr>`;}
           h+=`</tbody></table></div>`;
         }
       }
@@ -349,10 +468,45 @@ function setTab(t){tab=t;renderMain();}
 function toggleArch(){showArch=!showArch;si=0;of="All";af="All";stf="All";render();}
 document.getElementById("srch").addEventListener("input",e=>{srch=e.target.value;si=0;render();});
 function tgP(gi,pi){phases[gi][pi].open=!phases[gi][pi].open;renderMain();}
-function tgT(gi,pi,ti){phases[gi][pi].tasks[ti].complete=!phases[gi][pi].tasks[ti].complete;renderMain();}
+function tgT(gi,pi,ti){
+  const t=phases[gi][pi].tasks[ti];
+  t.complete=!t.complete;
+  if(t.complete){if(!t.completedDate){stamp(t);}t.status="Completed";}
+  else{t.completedDate="";if(t.status==="Completed"){t.status="Not Started";}}
+  renderMain();
+}
 function tgC(gi,pi,ti){phases[gi][pi].tasks[ti]._open=!phases[gi][pi].tasks[ti]._open;renderMain();}
 function updC(gi,pi,ti,v){phases[gi][pi].tasks[ti].comment=v;renderMain();}
-function addT(gi,pi){phases[gi][pi].tasks.push({task:"New task",priority:"Medium",status:"Not Started",comment:"",_open:false,complete:false});renderMain();}
+function updP(gi,pi,ti,v){phases[gi][pi].tasks[ti].priority=v;renderMain();}
+function stamp(t){const now=new Date();const d=now.toLocaleDateString("en-US",{month:"short",day:"numeric",year:"numeric"});const tm=now.toLocaleTimeString("en-US",{hour:"numeric",minute:"2-digit",hour12:true});t.completedDate=d+" · "+tm;}
+function updS(gi,pi,ti,v){
+  const t=phases[gi][pi].tasks[ti];
+  t.status=v;
+  if(v==="Completed"){
+    t.complete=true;
+    if(!t.completedDate){stamp(t);}
+  } else {
+    t.complete=false;
+    t.completedDate="";
+  }
+  renderMain();
+}
+function updO(gi,pi,ti,v){phases[gi][pi].tasks[ti].occ=v;}
+function updGD(gi,pi,ti,v){phases[gi][pi].tasks[ti].goalDate=v;renderMain();}
+let _delGi,_delPi,_delTi;
+function delT(gi,pi,ti){
+  _delGi=gi;_delPi=pi;_delTi=ti;
+  document.getElementById("delModalName").textContent=phases[gi][pi].tasks[ti].task;
+  document.getElementById("delModal").classList.add("show");
+}
+function closeDelModal(){document.getElementById("delModal").classList.remove("show");}
+function confirmDel(){
+  phases[_delGi][_delPi].tasks.splice(_delTi,1);
+  closeDelModal();
+  renderMain();
+}
+document.getElementById("delModal").addEventListener("click",function(e){if(e.target===this)closeDelModal();});
+function addT(gi,pi){phases[gi][pi].tasks.push({task:"New task",priority:"Medium",status:"Not Started",occ:"",goalDate:"",completedDate:"",comment:"",_open:false,complete:false});renderMain();}
 function tgM(id,arrid){const el=document.getElementById(id);const arr=document.getElementById(arrid);if(el){const open=el.style.display!=="block";el.style.display=open?"block":"none";if(arr)arr.textContent=open?"▲":"▼";}}
 render();
 </script>
