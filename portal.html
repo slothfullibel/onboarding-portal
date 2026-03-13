@@ -124,11 +124,85 @@ textarea{width:100%;font-size:11px;padding:5px 8px;background:#111827;border:1px
 .modal-cancel:hover{background:#1f2937;color:#f9fafb}
 .modal-confirm{background:#7f1d1d;color:#fca5a5;border-color:#ef4444}
 .modal-confirm:hover{background:#ef4444;color:#fff}
+
+/* ── MOBILE HAMBURGER BUTTON ────────────────────────────── */
+.mob-menu-btn{display:none;position:fixed;top:10px;left:10px;z-index:200;background:#1f2937;border:1px solid #374151;border-radius:8px;padding:7px 10px;cursor:pointer;color:#f9fafb;font-size:16px;line-height:1}
+.mob-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.6);z-index:150;backdrop-filter:blur(2px)}
+
+/* ── MOBILE MEDIA QUERY ─────────────────────────────────── */
+@media(max-width:768px){
+  /* Show hamburger, hide sidebar by default */
+  .mob-menu-btn{display:flex;align-items:center;justify-content:center}
+  .mob-overlay.open{display:block}
+
+  /* Sidebar slides in as drawer */
+  .sidebar{
+    position:fixed;left:-280px;top:0;bottom:0;z-index:160;
+    width:260px;transition:left .25s ease;
+    box-shadow:4px 0 24px rgba(0,0,0,.5);
+  }
+  .sidebar.mob-open{left:0}
+
+  /* Main takes full width, add top padding for hamburger */
+  .main{width:100%;padding-top:0}
+  .topbar{padding-top:10px}
+  .tr{padding-left:46px}  /* offset for hamburger button */
+
+  /* Card meta: 2×2 grid instead of 4-col */
+  .card-meta{grid-template-columns:repeat(2,1fr)!important;gap:12px}
+
+  /* Card header: stack title row and actions */
+  .card-top{flex-direction:column;gap:8px}
+  .card-title-row{flex-wrap:wrap;gap:6px}
+  .card-actions-row{display:flex;flex-wrap:wrap;gap:6px}
+
+  /* Task table: hide lower-priority cols, make it scrollable */
+  .tw{overflow-x:auto;-webkit-overflow-scrolling:touch}
+  table{table-layout:auto;min-width:420px}
+
+  /* Dropdowns: full width on mobile */
+  [id^="dd-links-"],[id^="dd-contacts-"]{
+    width:calc(100vw - 32px)!important;
+    left:16px!important;right:16px!important;
+    max-width:none!important;
+  }
+
+  /* Progress bar area */
+  .ptop{width:60px}
+
+  /* Sidebar search/pills padding */
+  .sb-top{padding:8px 8px 6px}
+  .pills{gap:3px}
+
+  /* Content padding tighter */
+  .content{padding:10px}
+
+  /* Phase header font */
+  .ph-lbl{font-size:11px!important}
+
+  /* Modal full-width on mobile */
+  .modal-box{width:calc(100vw - 40px)!important;max-width:none!important}
+}
+
+@media(max-width:480px){
+  /* Even tighter — hide assigned/goal date cols, keep task+status+priority */
+  .col-assigned,.col-goal,.col-completed{display:none}
+  th.col-assigned,th.col-goal,th.col-completed,
+  td.col-assigned,td.col-goal,td.col-completed{display:none}
+
+  /* Card name font */
+  .card-name{font-size:13px!important}
+
+  /* Meta 2-col stays but smaller gap */
+  .card-meta{gap:8px}
+}
 </style>
 </head>
 <body style="margin:0;padding:0;height:100vh;overflow:hidden">
+<button class="mob-menu-btn" id="mobMenuBtn" onclick="toggleMobSidebar()" aria-label="Menu">☰</button>
+<div class="mob-overlay" id="mobOverlay" onclick="closeMobSidebar()"></div>
 <div class="portal">
-<div class="sidebar">
+<div class="sidebar" id="sidebar">
   <div class="sb-top">
     <div class="sb-label">Clients</div>
     <input class="search" placeholder="Search..." id="srch">
@@ -422,7 +496,7 @@ ${cl.onboarder?`<div class="meta-lbl" style="margin-bottom:5px">Onboarded By</di
           else{cl.meetings.forEach((m,mi)=>{const atts=m.att||[];h+=`<div class="mr" onclick="tgM('bm${gi}-${mi}','ba${gi}-${mi}')"><div class="mri"><div class="mdate">${m.date}</div><div style="flex:1;display:flex;align-items:center;gap:7px;min-width:0"><span class="mtitle">${m.title}</span><span class="msrc ${m.src==="gong"?"gb":"zb"}">${m.src==="gong"?"Gong":"Zoom"}</span></div><div class="mdur">${m.dur}</div><div class="avrow">${atts.slice(0,3).map((a,i)=>`<div class="av" style="background:${ac(a.n)};margin-left:${i?"-5px":"0"}">${ini(a.n)}</div>`).join("")}${atts.length>3?`<div class="av" style="background:#374151;margin-left:-5px">+${atts.length-3}</div>`:""}</div><div id="ba${gi}-${mi}" style="font-size:9px;color:#374151;width:18px;text-align:center">▼</div></div><div class="mexp" id="bm${gi}-${mi}"><div class="ahhdr">Attendees · ${atts.length}</div>${atts.map(a=>`<div class="atrow"><div class="atav" style="background:${ac(a.n)}">${ini(a.n)}</div><div><div class="atn">${a.n}</div><div class="ats">${[a.t,a.e].filter(Boolean).join(" · ")}</div></div></div>`).join("")}${!atts.length?'<div style="font-size:11px;color:#4b5563;font-style:italic">No attendee data.</div>':""}</div></div>`;})}
           h+=`</div>`;
         }else{
-          h+=`<div class="tw"><table><colgroup><col style="width:22px"><col style="width:20px"><col style="width:22%"><col style="width:95px"><col style="width:140px"><col style="width:100px"><col style="width:100px"><col style="width:95px"><col style="width:22px"></colgroup><thead><tr><th></th><th></th><th>Task</th><th style="text-align:center">Priority</th><th style="text-align:center">Status</th><th style="text-align:center">Assigned To</th><th style="text-align:center">Goal Date</th><th style="text-align:center">Completed</th><th></th></tr></thead><tbody>`;
+          h+=`<div class="tw"><table><colgroup><col style="width:22px"><col style="width:20px"><col style="width:22%"><col style="width:95px"><col style="width:140px"><col style="width:100px"><col style="width:100px"><col style="width:95px"><col style="width:22px"></colgroup><thead><tr><th></th><th></th><th>Task</th><th style="text-align:center">Priority</th><th style="text-align:center">Status</th><th class="col-assigned" style="text-align:center">Assigned To</th><th class="col-goal" style="text-align:center">Goal Date</th><th class="col-completed" style="text-align:center">Completed</th><th></th></tr></thead><tbody>`;
           phase.tasks.forEach((task,ti)=>{
             const ps=PS[task.priority]||PS.Medium;const ss=SS[task.status]||SS[""];
             const occOpts=["Paul Gervasi","Philip Jacobs","Nico Valenzuela","Taylor Mastin","Levi Bond","Cara Landolt","Chad Hunt","Jesse Mayek","Josh Tazzetta","Chance Ray","Alan May"];
@@ -438,9 +512,9 @@ ${cl.onboarder?`<div class="meta-lbl" style="margin-bottom:5px">Onboarded By</di
 <td style="padding:2px 4px"><input value="${task.task.replace(/"/g,'&quot;')}" style="background:transparent;border:none;border-bottom:1px solid transparent;font-size:11px;color:#e5e7eb;width:100%;outline:none;text-decoration:${task.complete?'line-through':'none'};padding:1px 2px" onfocus="this.style.borderBottomColor='#4f46e5'" onblur="this.style.borderBottomColor='transparent';updTN(${gi},${pi},${ti},this.value)" onkeydown="if(event.key==='Enter')this.blur()"></td>
 <td style="padding:3px 5px"><div style="background:${ps.bg};border-radius:5px;overflow:hidden"><select style="background:${ps.bg};color:${ps.t};border:none;font-weight:700;font-size:11px;padding:2px 5px;width:100%;outline:none;cursor:pointer" onchange="updP(${gi},${pi},${ti},this.value)">${prSel}</select></div></td>
 <td style="padding:3px 5px"><div class="sel-wrap"><select style="background:${ss.bg};color:${ss.t};border-color:#374151" onchange="updS(${gi},${pi},${ti},this.value)">${stSel}</select></div></td>
-<td style="padding:3px 5px">${occDL}<input list="occ-dl-${gi}-${pi}-${ti}" value="${task.occ||''}" placeholder="— assign —" style="font-size:11px;padding:2px 5px;background:#1a2030;border:1px solid #374151;border-radius:5px;color:#a78bfa;width:100%;outline:none" oninput="updO(${gi},${pi},${ti},this.value)"></td>
-<td style="padding:3px 5px;text-align:center"><input type="date" value="${task.goalDate||""}" style="font-size:10px;padding:2px 4px;background:#1a2030;border:1px solid ${isOverdue?"#ef4444":"#374151"};border-radius:5px;color:${isOverdue?"#ef4444":"#9ca3af"};width:100%;outline:none;cursor:pointer" onchange="updGD(${gi},${pi},${ti},this.value)"></td>
-<td style="padding:3px 7px;text-align:center;font-size:10px;color:${task.completedDate?"#4ade80":"#374151"}">${task.completedDate||"—"}</td>
+<td class="col-assigned" style="padding:3px 5px">${occDL}<input list="occ-dl-${gi}-${pi}-${ti}" value="${task.occ||''}" placeholder="— assign —" style="font-size:11px;padding:2px 5px;background:#1a2030;border:1px solid #374151;border-radius:5px;color:#a78bfa;width:100%;outline:none" oninput="updO(${gi},${pi},${ti},this.value)"></td>
+<td class="col-goal" style="padding:3px 5px;text-align:center"><input type="date" value="${task.goalDate||""}" style="font-size:10px;padding:2px 4px;background:#1a2030;border:1px solid ${isOverdue?"#ef4444":"#374151"};border-radius:5px;color:${isOverdue?"#ef4444":"#9ca3af"};width:100%;outline:none;cursor:pointer" onchange="updGD(${gi},${pi},${ti},this.value)"></td>
+<td class="col-completed" style="padding:3px 7px;text-align:center;font-size:10px;color:${task.completedDate?"#4ade80":"#374151"}">${task.completedDate||"—"}</td>
 <td style="text-align:center;padding:5px 3px"><div class="exb${task.comment?" hc":""}" onclick="tgC(${gi},${pi},${ti})"><span style="font-size:6px;color:${task.comment?"#60a5fa":"#4b5563"}">${task._open?"▲":"▼"}</span></div></td></tr>`;
             if(task._open){h+=`<tr class="cmt-row"><td colspan="9"><div class="cmt-lbl">Comment</div><textarea rows="2" placeholder="Add a comment..." onchange="updC(${gi},${pi},${ti},this.value)">${task.comment||""}</textarea></td></tr>`;}
           });
@@ -460,13 +534,26 @@ ${cl.onboarder?`<div class="meta-lbl" style="margin-bottom:5px">Onboarded By</di
 }
 
 function render(){renderSB();renderMain();}
-function selC(i){si=i;tab="board";render();}
+function selC(i){si=i;tab="board";render();if(window.innerWidth<=768)closeMobSidebar();}
 function setO(o){of=o;si=0;render();}
 function setA(a){af=a;si=0;render();}
 function setSt(s){stf=s;si=0;render();}
 function sv(v){view=v;document.getElementById("bInt").className="vb"+(v==="internal"?" va":"");document.getElementById("bCli").className="vb"+(v==="client"?" va":"");renderMain();}
 function setTab(t){tab=t;renderMain();}
 function toggleArch(){showArch=!showArch;si=0;of="All";af="All";stf="All";render();}
+
+function toggleMobSidebar(){
+  var s=document.getElementById('sidebar');
+  var o=document.getElementById('mobOverlay');
+  s.classList.toggle('mob-open');
+  o.classList.toggle('open');
+}
+function closeMobSidebar(){
+  document.getElementById('sidebar').classList.remove('mob-open');
+  document.getElementById('mobOverlay').classList.remove('open');
+}
+// Close sidebar when a client is selected on mobile
+var _origRender;
 
 function shareBoard(gi){
   var fcs=fc();
