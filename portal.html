@@ -231,6 +231,50 @@ textarea{width:100%;font-size:11px;padding:5px 8px;background:#111827;border:1px
 .tx-toggle{font-size:10px;padding:2px 8px;background:#1a2030;border:1px solid #374151;border-radius:4px;color:#6b7280;cursor:pointer;flex-shrink:0}
 .tx-toggle.has{border-color:#4ade8040;color:#4ade80;background:#14532d40}
 .tx-area{width:100%;font-size:10px;padding:6px 8px;background:#0d1117;border:1px solid #374151;border-radius:5px;color:#9ca3af;resize:vertical;outline:none;font-family:monospace;line-height:1.5;margin-top:5px;min-height:80px}
+
+/* ── GANTT ───────────────────────────────────────────────── */
+.gantt-wrap{overflow-x:auto;overflow-y:auto;width:100%}
+.gantt-table{border-collapse:collapse;min-width:700px;width:100%}
+.gantt-label-col{width:200px;min-width:160px}
+.gantt-th{padding:4px 6px;font-size:9px;font-weight:700;color:#4b5563;text-transform:uppercase;letter-spacing:.07em;background:#0d1117;border-bottom:1px solid #1f2937;white-space:nowrap;text-align:center}
+.gantt-th.label{text-align:left}
+.gantt-row-ph td{background:#0d1117;padding:5px 8px;font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;border-bottom:1px solid #1f2937}
+.gantt-row td{border-bottom:1px solid #12161f;padding:3px 6px;vertical-align:middle}
+.gantt-row:hover td{background:#141926}
+.gantt-name{font-size:11px;color:#d1d5db;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:190px}
+.gantt-name.meeting{color:#60a5fa}
+.gantt-name.no-date{color:#374151;font-style:italic}
+.gantt-bar-cell{position:relative;height:22px}
+.gantt-bar{position:absolute;height:14px;top:4px;border-radius:3px;min-width:6px;display:flex;align-items:center;padding:0 5px;font-size:9px;font-weight:700;color:#fff;white-space:nowrap;overflow:hidden;cursor:default;transition:opacity .15s}
+.gantt-bar:hover{opacity:.85}
+.gantt-today{position:absolute;top:0;bottom:0;width:1px;background:#ef4444;opacity:.7;pointer-events:none}
+.gantt-today::after{content:'today';position:absolute;top:-16px;left:2px;font-size:8px;color:#ef4444;font-weight:700;letter-spacing:.05em}
+.gantt-empty{padding:30px;text-align:center;color:#374151;font-size:12px}
+.gantt-legend{display:flex;gap:14px;flex-wrap:wrap;margin-bottom:12px;font-size:10px;color:#6b7280;align-items:center}
+.gantt-legend-dot{width:10px;height:10px;border-radius:2px;flex-shrink:0}
+
+/* ── CUSTOM CALENDAR PICKER ──────────────────────────────── */
+.cal-wrap{position:relative;display:inline-block}
+.cal-btn{font-size:11px;font-weight:600;padding:2px 7px;background:#1a2030;border:1px solid #374151;border-radius:5px;color:#a78bfa;cursor:pointer;white-space:nowrap;min-width:90px;text-align:center}
+.cal-btn.empty{color:#4b5563}
+.cal-btn.overdue{border-color:#ef4444;color:#ef4444}
+.cal-btn.glv{font-size:12px;background:transparent;border:none;border-bottom:1px solid #374151;border-radius:0;min-width:110px;text-align:left;padding:1px 2px}
+.cal-drop{position:fixed;z-index:9999;background:#1e2433;border:1px solid #374151;border-radius:10px;box-shadow:0 8px 32px #000a;padding:10px;width:220px;display:none}
+.cal-drop.open{display:block}
+.cal-nav{display:flex;align-items:center;justify-content:space-between;margin-bottom:8px}
+.cal-nav button{background:none;border:none;color:#9ca3af;font-size:14px;cursor:pointer;padding:2px 6px;border-radius:4px}
+.cal-nav button:hover{background:#374151;color:#fff}
+.cal-nav span{font-size:11px;font-weight:700;color:#f9fafb}
+.cal-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:2px}
+.cal-dh{font-size:9px;font-weight:700;color:#4b5563;text-align:center;padding:2px 0;text-transform:uppercase}
+.cal-d{font-size:11px;text-align:center;padding:4px 2px;border-radius:4px;cursor:pointer;color:#9ca3af}
+.cal-d:hover{background:#374151;color:#fff}
+.cal-d.today{color:#60a5fa;font-weight:700}
+.cal-d.sel{background:#4f46e5;color:#fff;font-weight:700}
+.cal-d.other{color:#2d3748}
+.cal-d.other:hover{background:#1f2937;color:#4b5563}
+.cal-clear{display:block;width:100%;margin-top:8px;font-size:10px;padding:4px;background:none;border:1px solid #374151;border-radius:5px;color:#4b5563;cursor:pointer;text-align:center}
+.cal-clear:hover{color:#f87171;border-color:#f87171}
 </style>
 </head>
 <body style="margin:0;padding:0;height:100vh;overflow:hidden">
@@ -261,6 +305,7 @@ textarea{width:100%;font-size:11px;padding:5px 8px;background:#111827;border:1px
     </div>
     <div class="tabs">
       <button class="tb ta" id="tBoard" onclick="setTab('board')">Board</button>
+      <button class="tb" id="tGantt" onclick="setTab('gantt')">Gantt</button>
       <button class="tb" id="tMeet" onclick="setTab('meetings')">Meetings</button>
       <button class="tb" id="tIns" onclick="setTab('insights')">✦ Insights</button>
     </div>
@@ -303,7 +348,7 @@ const SM={
 };
 const ACTIVE_STAGES=new Set(["paid","waiting_on_materials","build_in_progress","build_completed","training_scheduled","driving_utilization"]);
 const OM={46491757:"Paul Gervasi",81817361:"Nico Valenzuela",173758648:"Philip Jacobs",173757457:"Taylor Mastin",495868686:"Chance Ray",644465735:"Alan May",116399656:"Chad Hunt",1592156152:"Josh Tazzetta",63601710:"Jesse Mayek",51013924:"Levi Bond",83451467:"Cara Landolt",67580456:"Ashley Chavez",62198195:"Bill Willcome",45550132:"Bryce Rutzke",30976993:"Joe McGinnis",124960031:"David Julio Alvarez",871380365:"Austin Conway",75702576:"Elizabeth Gervasi"};
-const EXTRAS={"Lunar Audio Video LLC":{"id":"4501","hsId":"50813295245","dropbox":"","contacts":[{"n":"Chris Young","t":"Managing Director","e":"cyoung@lunarav.com","p":""}],"buildStart":"2026-03-06"},"Top Tier":{"id":"4489","hsId":"49070841256","dropbox":"","contacts":[{"n":"Jordon Winters","t":"","e":"jordon@toptierhbs.net","p":"8134532747"},{"n":"Shermal Thomas","t":"Office Assistant","e":"shermal@toptierhbs.net","p":"8138023378"}]},"Re-Bath of Augusta":{"id":"","hsId":"","dropbox":"","contacts":[]},"Alta Windows & Door":{"id":"4473","hsId":"48192452487","dropbox":"","contacts":[{"n":"Steven Juker","t":"Director of Operations","e":"sjuker@altawindowdoor.com","p":"2083512219"},{"n":"msessa","t":"","e":"msessa@altawindowdoor.com","p":""}]},"Affordable Windows and Roofing":{"id":"","hsId":"","dropbox":"","contacts":[]},"SuperFast Kitchen and Bath":{"id":"","hsId":"","dropbox":"","contacts":[]},"Elia Bathroom Designs":{"id":"","hsId":"","dropbox":"","contacts":[]},"Cypress Bath":{"id":"","hsId":"","dropbox":"","contacts":[]},"Jay Bee Contracting":{"id":"4399","hsId":"52910956374","dropbox":"","contacts":[{"n":"Justin Britton","t":"President","e":"jbritton@jaybeecontracting.com","p":"585-880-3457"}],"buildStart":"2025-09-09"},"Quick Bath Solutions":{"id":"","hsId":"","dropbox":"","contacts":[]},"XPRT Outdoor":{"id":"","hsId":"","dropbox":"","contacts":[]},"Custom Services Co LLC":{"id":"4262","hsId":"30228214800","dropbox":"","contacts":[{"n":"Rick Eavenson","t":"Certified Aging-in-Place Specialist","e":"rick@customservicescollc.com","p":"9012033241"}]},"Lux Design Builds":{"id":"3871","hsId":"31640417068","dropbox":"","contacts":[{"n":"Marcin Wyszomirski","t":"Interior Designer","e":"marcin@luxdesignbuilds.com","p":"","hsContactId":"150617853474"},{"n":"Sydney Mukwacha","t":"Office Manager","e":"officemgr@luxdesignbuilds.com","p":"4254358936","hsContactId":"32852142618"}],"buildStart":"2024-05-15"},"STL Roof Pros":{"id":"","hsId":"","dropbox":"","contacts":[]},"Virginia Bath Works Inc.":{"id":"","hsId":"","dropbox":"","contacts":[]},"Rebath San Antonio":{"id":"","hsId":"","dropbox":"","contacts":[]},"Dominican Outdoor Solutions":{"id":"","hsId":"","dropbox":"","contacts":[]},"Refined Spaces LLC":{"id":"","hsId":"","dropbox":"","contacts":[]},"MOD Bath USA":{"id":"","hsId":"","dropbox":"","contacts":[]},"Go Roofing":{"id":"","hsId":"","dropbox":"","contacts":[]},"Window Depot USA of Fort Wayne":{"id":"","hsId":"","dropbox":"","contacts":[]},"Bath Planet of Paducah":{"id":"4286","hsId":"31622601557","dropbox":"","contacts":[],"buildStart":"2025-05-30"},"Donaway Bath":{"id":"4263","hsId":"30269165230","dropbox":"","contacts":[{"n":"Galen Gardner","t":"Owner","e":"galen@donaway.com","p":"4437831710","hsContactId":"100917225250"}],"buildStart":"2025-03-12"},"Re-Bath of New England":{"id":"4256","hsId":"29688847148","dropbox":"","contacts":[{"n":"Bill Trombly","t":"Owner","e":"bill.trombly@rebath.com","p":"6032353433","hsContactId":"174117297571"},{"n":"Jordan Trombly","t":"General Manager","e":"jordan.trombly@rebath.com","p":"6036250303","hsContactId":"96918250648"},{"n":"Jeff McCormack","t":"Sales Manager","e":"jeff.mccormack@rebath.com","p":"6036250303","hsContactId":"104030483573"},{"n":"Susan Oliver","t":"VP of Operations","e":"susan.oliver@rebath.com","p":"4322039736"}],"buildStart":"2025-03-12"},"Legacy Design & Remodeling":{"id":"","hsId":"","dropbox":"","contacts":[]},"Stonebridge Kitchen and Bath LLC":{"id":"4490","hsId":"51139252400","dropbox":"","contacts":[{"n":"Gage Smith","t":"Co-Founder","e":"gagesmith@stonebridgekitchenandbath.com","p":"3522742679"}]},"4D Custom Builders":{"id":"","hsId":"","dropbox":"","contacts":[]},"Bathrooms of Charleston":{"id":"","hsId":"","dropbox":"","contacts":[]},"Lotus Kitchen & Bath":{"id":"","hsId":"","dropbox":"","contacts":[]},"Fortress Roofing":{"id":"","hsId":"","dropbox":"","contacts":[]},"Backyard Fun Pools":{"id":"","hsId":"","dropbox":"","contacts":[]},"Paramount Xterior":{"id":"4282","hsId":"30987093852","dropbox":"","contacts":[{"n":"Ian Ally","t":"Owner","e":"ianally@paramountxterior.com","p":"2404058648"},{"n":"Bryan Puglio","t":"","e":"bpuglio@paramountxterior.com","p":""}]},"Well Decor LLC":{"id":"4243","hsId":"29699866979","dropbox":"","contacts":[{"n":"Yuan Zhou","t":"Owner","e":"yuan@well-decor.com","p":"8586036486","hsContactId":"97697525762"}],"buildStart":"2025-02-18"},"Welcome Renovation":{"id":"4237","hsId":"29642322250","dropbox":"","contacts":[{"n":"Greg Takeshita","t":"Founder","e":"greg@welcomerenovation.com","p":"9493389960"},{"n":"Lukus Meulink","t":"Director of Project Management","e":"lukus.meulink@welcomerenovation.com","p":"3108032496"}],"buildStart":"2025-02-17"},"Sunshine Contracting Corporation":{"id":"3815","hsId":"42249021846","dropbox":"","contacts":[{"n":"Ryan Sabo","t":"Owner","e":"rsabo@sunshinecontractingcorp.com","p":"7034892691"},{"n":"Crawford Conniff","t":"Sales Manager","e":"cconniff@sunshinecontractingcorp.com","p":"7034998654"},{"n":"Nate Sullivan","t":"VP of Operations","e":"nsullivan@sunshinecontractingcorp.com","p":"7034998654"}],"buildStart":"2024-04-01"},"Platinum Roofing Construction":{"id":"4273","hsId":"29201891909","dropbox":"","contacts":[{"n":"Jason Bye","t":"","e":"jbye.grs@gmail.com","p":"5079511465","hsContactId":"94790742870"}],"buildStart":"2025-03-17"},"SE Property Group":{"id":"4258","hsId":"30345736117","dropbox":"","contacts":[]},"Quality Sheet Metal Heating & Air Inc.":{"id":"4279","hsId":"31701952826","dropbox":"","contacts":[{"n":"John McNamee","t":"","e":"qualityshtmetal7@gmail.com","p":"9169189920"},{"n":"Tonya McNamee","t":"CFO","e":"tmcnamee@comehometoquality.com","p":"9169189920"}]},"Re-Bath Midland":{"id":"4231","hsId":"36417221527","dropbox":"","contacts":[{"n":"Henry Wall","t":"Owner","e":"henry.wall@rebath.com","p":"8063192213"},{"n":"Susan Oliver","t":"VP of Operations","e":"susan.oliver@rebath.com","p":"4322039736"}],"buildStart":"2025-02-04"},"Pacific Coast Re-Bath":{"id":"4270","hsId":"30589147820","dropbox":"","contacts":[{"n":"susan engbrecht","t":"","e":"mstorms@pcrebath.com","p":"8184896351","hsContactId":"105064119878"}],"buildStart":"2025-03-26"},"Lutton Construction":{"id":"4269","hsId":"30350664301","dropbox":"","contacts":[{"n":"Kyle Lutton","t":"Owner","e":"kyle@luttonco.com","p":"6149802281"},{"n":"Raymond Perez","t":"Production Manager","e":"raymond@luttonco.com","p":"5622212165"}]},"Task Masters Handyman Services Inc":{"id":"4274","hsId":"30426563492","dropbox":"","contacts":[{"n":"Chris Deanovic","t":"COO","e":"chrisd@tmimn.com","p":"6128367808"},{"n":"Calvin Schiltz","t":"","e":"calvins@tmimn.com","p":""}]},"MODE Renovation LLC":{"id":"3983","hsId":"42249819261","dropbox":"","contacts":[{"n":"Ryan Keene","t":"CEO","e":"rkeene@moderenovation.com","p":"7148847498"},{"n":"Linda Miller","t":"Sales Manager","e":"lmiller@moderenovation.com","p":"9257195101"}],"buildStart":"2024-09-03"},"Potomac Custom Remodeling":{"id":"4284","hsId":"31030356805","dropbox":"","contacts":[{"n":"anthony marks","t":"Implementation Director","e":"anthony@potomaccustomremodeling.com","p":"3017606869","hsContactId":"105845219730"},{"n":"Cory Minzyk","t":"VP of Marketing","e":"cory.minzyk@potomaccustomremodeling.com","p":"7034050904","hsContactId":"194982850060"}],"buildStart":"2025-03-26"},"Home Pros Remodeling":{"id":"4247","hsId":"30080307989","dropbox":"","contacts":[{"n":"Dan Reyes","t":"Owner","e":"danr@homepros-usa.com","p":"5056006783","hsContactId":"100132375114"},{"n":"Jason Balthrop","t":"General Manager","e":"jasonb@homepros-usa.com","p":"5053626276","hsContactId":"100149126728"},{"n":"James Culwell","t":"Sales Manager","e":"jculwell@homepros-usa.com","p":"3603938935","hsContactId":"109428761121"}],"buildStart":"2025-03-05"},"Timber Ridge Roofing & Exteriors":{"id":"4278","hsId":"31071289206","dropbox":"","contacts":[{"n":"Kyler McCarty","t":"Owner","e":"kmccarty@timberridgeroof.com","p":"7125718089"}]},"Big Country Exteriors":{"id":"4277","hsId":"29631079787","dropbox":"","contacts":[{"n":"Timothy Dascenzo","t":"Owner","e":"tim@bigcountryexteriors.com","p":"6094915334"}]},"Baths by Bill":{"id":"4256","hsId":"29688847148","dropbox":"","contacts":[],"buildStart":"2025-03-12"},"Legacy Exteriors":{"id":"3965","hsId":"21963237464","dropbox":"","contacts":[{"n":"Jeremy Bibb","t":"Owner","e":"jeremy@legacyexteriorstx.com","p":"5126631864","hsContactId":"40285839188"},{"n":"Stephen Hines","t":"Sales Manager","e":"stephen@legacyexteriorstx.com","p":"5126631864","hsContactId":"40285839190"}],"buildStart":"2024-07-23"},"Design Surfaces":{"id":"4232","hsId":"34585614357","dropbox":"","contacts":[{"n":"Nick Benvenuto","t":"Owner / Lead Designer","e":"nick@designsurfacesmi.com","p":"6164058011"},{"n":"Kurt Schlosser","t":"Showroom Manager","e":"kurt@designsurfacesmi.com","p":"7346360750"}],"buildStart":"2025-02-13"},"DC Enclosures, Inc.":{"id":"4239","hsId":"29675275418","dropbox":"","contacts":[{"n":"Tamara DeSantis","t":"Operations Manager","e":"tamarade@dcenclosures.com","p":"6785284946"}],"buildStart":"2025-02-19"},"BathHound":{"id":"4478","hsId":"47580838193","dropbox":"","contacts":[{"n":"Esi Medina","t":"GM","e":"esi.medina@bathhound.com","p":"7205467256"},{"n":"Jon Stucky","t":"","e":"jon.stucky@bathhound.com","p":""},{"n":"Heather Meyers","t":"Salesrep","e":"heather.meyers@bathhound.com","p":""}]}};
+const EXTRAS={"Lunar Audio Video LLC":{"id":"4501","hsId":"50813295245","dropbox":"","contacts":[{"n":"Chris Young","t":"Managing Director","e":"cyoung@lunarav.com","p":""}],"buildStart":"2026-03-06"},"Top Tier":{"id":"4489","hsId":"49070841256","dropbox":"","contacts":[{"n":"Jordon Winters","t":"","e":"jordon@toptierhbs.net","p":"8134532747"},{"n":"Shermal Thomas","t":"Office Assistant","e":"shermal@toptierhbs.net","p":"8138023378"}]},"Re-Bath of Augusta":{"id":"","hsId":"","dropbox":"","contacts":[]},"Alta Windows & Door":{"id":"4473","hsId":"48192452487","dropbox":"","contacts":[{"n":"Steven Juker","t":"Director of Operations","e":"sjuker@altawindowdoor.com","p":"2083512219"},{"n":"msessa","t":"","e":"msessa@altawindowdoor.com","p":""}]},"Affordable Windows and Roofing":{"id":"","hsId":"","dropbox":"","contacts":[]},"SuperFast Kitchen and Bath":{"id":"","hsId":"","dropbox":"","contacts":[]},"Elia Bathroom Designs":{"id":"","hsId":"","dropbox":"","contacts":[]},"Cypress Bath":{"id":"","hsId":"","dropbox":"","contacts":[]},"Jay Bee Contracting":{"id":"4399","hsId":"52910956374","dropbox":"","contacts":[{"n":"Justin Britton","t":"President","e":"jbritton@jaybeecontracting.com","p":"585-880-3457"}],"buildStart":"2025-09-09"},"Quick Bath Solutions":{"id":"","hsId":"","dropbox":"","contacts":[]},"XPRT Outdoor":{"id":"","hsId":"","dropbox":"","contacts":[]},"Custom Services Co LLC":{"id":"4262","hsId":"30228214800","dropbox":"","contacts":[{"n":"Rick Eavenson","t":"Certified Aging-in-Place Specialist","e":"rick@customservicescollc.com","p":"9012033241"}]},"Lux Design Builds":{"id":"3871","hsId":"31640417068","dropbox":"","contacts":[{"n":"Marcin Wyszomirski","t":"Interior Designer","e":"marcin@luxdesignbuilds.com","p":"","hsContactId":"150617853474"},{"n":"Sydney Mukwacha","t":"Office Manager","e":"officemgr@luxdesignbuilds.com","p":"4254358936","hsContactId":"32852142618"}],"buildStart":"2024-05-15"},"STL Roof Pros":{"id":"","hsId":"","dropbox":"","contacts":[]},"Virginia Bath Works Inc.":{"id":"","hsId":"","dropbox":"","contacts":[]},"Rebath San Antonio":{"id":"","hsId":"","dropbox":"","contacts":[]},"Dominican Outdoor Solutions":{"id":"","hsId":"","dropbox":"","contacts":[]},"Refined Spaces LLC":{"id":"","hsId":"","dropbox":"","contacts":[]},"MOD Bath USA":{"id":"","hsId":"","dropbox":"","contacts":[]},"Go Roofing":{"id":"","hsId":"","dropbox":"","contacts":[]},"Window Depot USA of Fort Wayne":{"id":"","hsId":"","dropbox":"","contacts":[]},"Bath Planet of Paducah":{"id":"4286","hsId":"31622601557","dropbox":"","contacts":[],"buildStart":"2025-05-30"},"Donaway Bath":{"id":"4263","hsId":"30269165230","dropbox":"","contacts":[{"n":"Galen Gardner","t":"Owner","e":"galen@donaway.com","p":"4437831710","hsContactId":"100917225250"}],"buildStart":"2025-03-12","goLiveActual":"2025-09-04"},"Re-Bath of New England":{"id":"4256","hsId":"29688847148","dropbox":"","contacts":[{"n":"Bill Trombly","t":"Owner","e":"bill.trombly@rebath.com","p":"6032353433","hsContactId":"174117297571"},{"n":"Jordan Trombly","t":"General Manager","e":"jordan.trombly@rebath.com","p":"6036250303","hsContactId":"96918250648"},{"n":"Jeff McCormack","t":"Sales Manager","e":"jeff.mccormack@rebath.com","p":"6036250303","hsContactId":"104030483573"},{"n":"Susan Oliver","t":"VP of Operations","e":"susan.oliver@rebath.com","p":"4322039736"}],"buildStart":"2025-03-12"},"Legacy Design & Remodeling":{"id":"","hsId":"","dropbox":"","contacts":[]},"Stonebridge Kitchen and Bath LLC":{"id":"4490","hsId":"51139252400","dropbox":"","contacts":[{"n":"Gage Smith","t":"Co-Founder","e":"gagesmith@stonebridgekitchenandbath.com","p":"3522742679"}]},"4D Custom Builders":{"id":"","hsId":"","dropbox":"","contacts":[]},"Bathrooms of Charleston":{"id":"","hsId":"","dropbox":"","contacts":[]},"Lotus Kitchen & Bath":{"id":"","hsId":"","dropbox":"","contacts":[]},"Fortress Roofing":{"id":"","hsId":"","dropbox":"","contacts":[]},"Backyard Fun Pools":{"id":"","hsId":"","dropbox":"","contacts":[]},"Paramount Xterior":{"id":"4282","hsId":"30987093852","dropbox":"","contacts":[{"n":"Ian Ally","t":"Owner","e":"ianally@paramountxterior.com","p":"2404058648"},{"n":"Bryan Puglio","t":"","e":"bpuglio@paramountxterior.com","p":""}]},"Well Decor LLC":{"id":"4243","hsId":"29699866979","dropbox":"","contacts":[{"n":"Yuan Zhou","t":"Owner","e":"yuan@well-decor.com","p":"8586036486","hsContactId":"97697525762"}],"buildStart":"2025-02-18"},"Welcome Renovation":{"id":"4237","hsId":"29642322250","dropbox":"","contacts":[{"n":"Greg Takeshita","t":"Founder","e":"greg@welcomerenovation.com","p":"9493389960"},{"n":"Lukus Meulink","t":"Director of Project Management","e":"lukus.meulink@welcomerenovation.com","p":"3108032496"}],"buildStart":"2025-02-17"},"Sunshine Contracting Corporation":{"id":"3815","hsId":"42249021846","dropbox":"","contacts":[{"n":"Ryan Sabo","t":"Owner","e":"rsabo@sunshinecontractingcorp.com","p":"7034892691"},{"n":"Crawford Conniff","t":"Sales Manager","e":"cconniff@sunshinecontractingcorp.com","p":"7034998654"},{"n":"Nate Sullivan","t":"VP of Operations","e":"nsullivan@sunshinecontractingcorp.com","p":"7034998654"}],"buildStart":"2024-04-01"},"Platinum Roofing Construction":{"id":"4273","hsId":"29201891909","dropbox":"","contacts":[{"n":"Jason Bye","t":"","e":"jbye.grs@gmail.com","p":"5079511465","hsContactId":"94790742870"}],"buildStart":"2025-03-17"},"SE Property Group":{"id":"4258","hsId":"30345736117","dropbox":"","contacts":[]},"Quality Sheet Metal Heating & Air Inc.":{"id":"4279","hsId":"31701952826","dropbox":"","contacts":[{"n":"John McNamee","t":"","e":"qualityshtmetal7@gmail.com","p":"9169189920"},{"n":"Tonya McNamee","t":"CFO","e":"tmcnamee@comehometoquality.com","p":"9169189920"}]},"Re-Bath Midland":{"id":"4231","hsId":"36417221527","dropbox":"","contacts":[{"n":"Henry Wall","t":"Owner","e":"henry.wall@rebath.com","p":"8063192213"},{"n":"Susan Oliver","t":"VP of Operations","e":"susan.oliver@rebath.com","p":"4322039736"}],"buildStart":"2025-02-04"},"Pacific Coast Re-Bath":{"id":"4270","hsId":"30589147820","dropbox":"","contacts":[{"n":"susan engbrecht","t":"","e":"mstorms@pcrebath.com","p":"8184896351","hsContactId":"105064119878"}],"buildStart":"2025-03-26"},"Lutton Construction":{"id":"4269","hsId":"30350664301","dropbox":"","contacts":[{"n":"Kyle Lutton","t":"Owner","e":"kyle@luttonco.com","p":"6149802281"},{"n":"Raymond Perez","t":"Production Manager","e":"raymond@luttonco.com","p":"5622212165"}]},"Task Masters Handyman Services Inc":{"id":"4274","hsId":"30426563492","dropbox":"","contacts":[{"n":"Chris Deanovic","t":"COO","e":"chrisd@tmimn.com","p":"6128367808"},{"n":"Calvin Schiltz","t":"","e":"calvins@tmimn.com","p":""}]},"MODE Renovation LLC":{"id":"3983","hsId":"42249819261","dropbox":"","contacts":[{"n":"Ryan Keene","t":"CEO","e":"rkeene@moderenovation.com","p":"7148847498"},{"n":"Linda Miller","t":"Sales Manager","e":"lmiller@moderenovation.com","p":"9257195101"}],"buildStart":"2024-09-03"},"Potomac Custom Remodeling":{"id":"4284","hsId":"31030356805","dropbox":"","contacts":[{"n":"anthony marks","t":"Implementation Director","e":"anthony@potomaccustomremodeling.com","p":"3017606869","hsContactId":"105845219730"},{"n":"Cory Minzyk","t":"VP of Marketing","e":"cory.minzyk@potomaccustomremodeling.com","p":"7034050904","hsContactId":"194982850060"}],"buildStart":"2025-03-26"},"Home Pros Remodeling":{"id":"4247","hsId":"30080307989","dropbox":"","contacts":[{"n":"Dan Reyes","t":"Owner","e":"danr@homepros-usa.com","p":"5056006783","hsContactId":"100132375114"},{"n":"Jason Balthrop","t":"General Manager","e":"jasonb@homepros-usa.com","p":"5053626276","hsContactId":"100149126728"},{"n":"James Culwell","t":"Sales Manager","e":"jculwell@homepros-usa.com","p":"3603938935","hsContactId":"109428761121"}],"buildStart":"2025-03-05"},"Timber Ridge Roofing & Exteriors":{"id":"4278","hsId":"31071289206","dropbox":"","contacts":[{"n":"Kyler McCarty","t":"Owner","e":"kmccarty@timberridgeroof.com","p":"7125718089"}]},"Big Country Exteriors":{"id":"4277","hsId":"29631079787","dropbox":"","contacts":[{"n":"Timothy Dascenzo","t":"Owner","e":"tim@bigcountryexteriors.com","p":"6094915334"}]},"Baths by Bill":{"id":"4256","hsId":"29688847148","dropbox":"","contacts":[],"buildStart":"2025-03-12"},"Legacy Exteriors":{"id":"3965","hsId":"21963237464","dropbox":"","contacts":[{"n":"Jeremy Bibb","t":"Owner","e":"jeremy@legacyexteriorstx.com","p":"5126631864","hsContactId":"40285839188"},{"n":"Stephen Hines","t":"Sales Manager","e":"stephen@legacyexteriorstx.com","p":"5126631864","hsContactId":"40285839190"}],"buildStart":"2024-07-23"},"Design Surfaces":{"id":"4232","hsId":"34585614357","dropbox":"","contacts":[{"n":"Nick Benvenuto","t":"Owner / Lead Designer","e":"nick@designsurfacesmi.com","p":"6164058011"},{"n":"Kurt Schlosser","t":"Showroom Manager","e":"kurt@designsurfacesmi.com","p":"7346360750"}],"buildStart":"2025-02-13"},"DC Enclosures, Inc.":{"id":"4239","hsId":"29675275418","dropbox":"","contacts":[{"n":"Tamara DeSantis","t":"Operations Manager","e":"tamarade@dcenclosures.com","p":"6785284946"}],"buildStart":"2025-02-19"},"BathHound":{"id":"4478","hsId":"47580838193","dropbox":"","contacts":[{"n":"Esi Medina","t":"GM","e":"esi.medina@bathhound.com","p":"7205467256"},{"n":"Jon Stucky","t":"","e":"jon.stucky@bathhound.com","p":""},{"n":"Heather Meyers","t":"Salesrep","e":"heather.meyers@bathhound.com","p":""}]},"Weber Bros Kitchens & Baths":{"id":"4413","hsId":"35584891299","dropbox":"","contacts":[],"goLiveActual":"2026-01-12"},"Barry Best Gutters & Awnings":{"id":"4244","hsId":"28584911751","dropbox":"","contacts":[],"goLiveActual":"2025-03-25"},"Woodland Roofing & Exteriors":{"id":"4479","hsId":"15686467476","dropbox":"","contacts":[],"goLiveActual":"2023-05-08"}};
 
 const MTYPES=["Discovery","Kick-Off Call","Build Review","Admin Training","Sales Training","Team Training","Retention"];
 const ASTATUS=["Attended","Canceled","Postponed"];
@@ -321,13 +366,13 @@ const SS={"Not Started":{bg:"#1f2937",t:"#9ca3af"},"In Progress - OCC":{bg:"#1e3
 const PT=[
   {id:"kd",label:"Key Drivers",color:"#ef4444",tasks:[{task:"Key Driver 1",priority:"Critical",status:"",occ:"",goalDate:"",completedDate:"",comment:"",_open:false,complete:false},{task:"Key Driver 2",priority:"Critical",status:"",occ:"",goalDate:"",completedDate:"",comment:"",_open:false,complete:false},{task:"Key Driver 3",priority:"Critical",status:"",occ:"",goalDate:"",completedDate:"",comment:"",_open:false,complete:false}]},
   {id:"p2d",label:"Meetings",color:"#f97316",tasks:[]},
-  {id:"p1a",label:"Phase 1a – Introduction",color:"#f59e0b",tasks:[{task:"Intro Call Scheduled",priority:"Critical",status:"In Progress - OCC",occ:"",goalDate:"",completedDate:"",comment:"",_open:false,complete:false},{task:"Intro Call Follow Up Email",priority:"Critical",status:"In Progress - OCC",occ:"",goalDate:"",completedDate:"",comment:"",_open:false,complete:false},{task:"Ideal Go Live Date",priority:"Critical",status:"In Progress - OCC",occ:"",goalDate:"",completedDate:"",comment:"",_open:false,complete:false}]},
-  {id:"p1b",label:"Phase 1b – Materials Gathering",color:"#eab308",tasks:[{task:"Priority 1 Pricing Materials",priority:"Critical",status:"In Progress - Customer",occ:"",goalDate:"",completedDate:"",comment:"",_open:false,complete:false},{task:"Contract(s)",priority:"Critical",status:"In Progress - Customer",occ:"",goalDate:"",completedDate:"",comment:"",_open:false,complete:false},{task:"Send user list",priority:"Critical",status:"In Progress - Customer",occ:"",goalDate:"",completedDate:"",comment:"",_open:false,complete:false},{task:"OCC Payments",priority:"High",status:"In Progress - Customer",occ:"",goalDate:"",completedDate:"",comment:"",_open:false,complete:false}]},
-  {id:"p2a",label:"Phase 2a – Price List Building",color:"#84cc16",tasks:[{task:"Priority 1 Vertical",priority:"Critical",status:"Not Started",occ:"",goalDate:"",completedDate:"",comment:"",_open:false,complete:false},{task:"Priority 2 Vertical",priority:"High",status:"Not Started",occ:"",goalDate:"",completedDate:"",comment:"",_open:false,complete:false}]},
-  {id:"p2b",label:"Phase 2b – Document Coding",color:"#22c55e",tasks:[{task:"Contract(s) Coded",priority:"High",status:"Not Started",occ:"",goalDate:"",completedDate:"",comment:"",_open:false,complete:false},{task:"Fillable Documents",priority:"Medium",status:"Not Started",occ:"",goalDate:"",completedDate:"",comment:"",_open:false,complete:false}]},
-  {id:"p2c",label:"Phase 2c – Platform Config",color:"#16a34a",tasks:[{task:"Integrations",priority:"Medium",status:"Not Started",occ:"",goalDate:"",completedDate:"",comment:"",_open:false,complete:false},{task:"Payment Terms",priority:"High",status:"Not Started",occ:"",goalDate:"",completedDate:"",comment:"",_open:false,complete:false},{task:"Discounts",priority:"Low",status:"Not Started",occ:"",goalDate:"",completedDate:"",comment:"",_open:false,complete:false}]},
-  {id:"p3",label:"Phase 3 – Go Live!",color:"#15803d",tasks:[{task:"Final Feedback Meeting",priority:"Critical",status:"Not Started",occ:"",goalDate:"",completedDate:"",comment:"",_open:false,complete:false},{task:"Build Sign Off",priority:"Critical",status:"",occ:"",goalDate:"",completedDate:"",comment:"",_open:false,complete:false},{task:"Sales Team Training",priority:"Critical",status:"Not Started",occ:"",goalDate:"",completedDate:"",comment:"",_open:false,complete:false}]}
+  {id:"p1",label:"Phase 1 – Materials Gathering",color:"#eab308",tasks:[{task:"Pricing Materials",priority:"Critical",status:"In Progress - Customer",occ:"",goalDate:"",completedDate:"",comment:"",_open:false,complete:false},{task:"Contract(s)",priority:"Critical",status:"In Progress - Customer",occ:"",goalDate:"",completedDate:"",comment:"",_open:false,complete:false},{task:"Send Full User List",priority:"Critical",status:"In Progress - Customer",occ:"",goalDate:"",completedDate:"",comment:"",_open:false,complete:false},{task:"OCC Payments",priority:"High",status:"In Progress - Customer",occ:"",goalDate:"",completedDate:"",comment:"",_open:false,complete:false}]},
+  {id:"p2",label:"Phase 2 – Build",color:"#22c55e",tasks:[{task:"Priority 1 Vertical",priority:"Critical",status:"Not Started",occ:"",goalDate:"",completedDate:"",comment:"",_open:false,complete:false},{task:"Priority 2 Vertical",priority:"High",status:"Not Started",occ:"",goalDate:"",completedDate:"",comment:"",_open:false,complete:false},{task:"Contract(s) Coded",priority:"High",status:"Not Started",occ:"",goalDate:"",completedDate:"",comment:"",_open:false,complete:false},{task:"Fillable Documents",priority:"Medium",status:"Not Started",occ:"",goalDate:"",completedDate:"",comment:"",_open:false,complete:false},{task:"Integrations",priority:"Medium",status:"Not Started",occ:"",goalDate:"",completedDate:"",comment:"CRM: \nOther: ",_open:false,complete:false},{task:"Payment Terms",priority:"High",status:"Not Started",occ:"",goalDate:"",completedDate:"",comment:"",_open:false,complete:false},{task:"Discounts",priority:"Low",status:"Not Started",occ:"",goalDate:"",completedDate:"",comment:"",_open:false,complete:false}]},
+  {id:"p3",label:"Phase 3 – Go Live!",color:"#15803d",tasks:[{task:"Build Sign Off",priority:"Critical",status:"",occ:"",goalDate:"",completedDate:"",comment:"",_open:false,complete:false},{task:"Sales Team Training",priority:"Critical",status:"Not Started",occ:"",goalDate:"",completedDate:"",comment:"",_open:false,complete:false}]}
 ];
+
+// Per-client Go Live Date storage
+const goLiveDates={};
 
 // === LIVE CLIENT DATA (synced Mar 14, 2026) ===
 const CLIENTS=[
@@ -365,11 +410,19 @@ const CLIENTS=[
   {name:"Lotus Kitchen & Bath",onboarder:"Nico Valenzuela",archived:false,hs:{stage:"build_in_progress",seats:"3",am:644465735},meetings:[{date:"2026-02-27",title:"Kickoff Call",dur:"40 min",src:"zoom",att:[]}]},
   {name:"Fortress Roofing",onboarder:"Nico Valenzuela",archived:false,hs:{stage:"paid",seats:"7",am:63601710},meetings:[{date:"2025-10-29",title:"Kickoff Call",dur:"45 min",src:"zoom",att:[]}]},
   {name:"Backyard Fun Pools",onboarder:"Nico Valenzuela",archived:false,hs:{stage:"build_in_progress",seats:"3",am:495868686},meetings:[{date:"2025-08-27",title:"Kickoff Call",dur:"40 min",src:"zoom",att:[]}]},
+  // PHILIP JACOBS - additional
+  {name:"Bathworks",onboarder:"Philip Jacobs",archived:false,hs:{stage:"build_in_progress",seats:"45",am:116399656},meetings:[]},
+  {name:"Bath Remodel by Capital",onboarder:"",archived:false,hs:{stage:"build_completed",seats:"9",am:116399656},meetings:[]},
+  {name:"Signature Home Services LLC",onboarder:"Philip Jacobs",archived:false,hs:{stage:"build_in_progress",seats:"11",am:""},meetings:[]},
+  // PAUL GERVASI - additional
+  {name:"Contract Exteriors",onboarder:"Paul Gervasi",archived:false,hs:{stage:"build_completed",seats:"9",am:495868686},meetings:[]},
+  // NICO VALENZUELA - additional
+  {name:"Porch Outfitters",onboarder:"Nico Valenzuela",archived:false,hs:{stage:"training_scheduled",seats:"3",am:""},meetings:[]},
   // NEW ACTIVE (no onboarder assigned)
-  {name:"Five Star Bath Solutions of San Francisco",onboarder:"",archived:false,hs:{stage:"build_in_progress",seats:"1",am:495868686},meetings:[]},
-  {name:"Five Star Bath Solutions of Los Angeles County",onboarder:"",archived:false,hs:{stage:"build_in_progress",seats:"2",am:51013924},meetings:[]},
-  {name:"Erdmann Outdoor Living",onboarder:"",archived:false,hs:{stage:"build_in_progress",seats:"1",am:""},meetings:[]},
-  {name:"Re-Bath SE",onboarder:"",archived:false,hs:{stage:"build_in_progress",seats:"3",am:495868686},meetings:[]},
+  {name:"Five Star Bath Solutions of San Francisco",onboarder:"",archived:false,hs:{stage:"build_in_progress",seats:"1",am:51013924},meetings:[]},
+  {name:"Five Star Bath Solutions of Los Angeles County",onboarder:"",archived:false,hs:{stage:"build_in_progress",seats:"2",am:116399656},meetings:[]},
+  {name:"Erdmann Outdoor Living",onboarder:"",archived:false,hs:{stage:"build_in_progress",seats:"1",am:495868686},meetings:[]},
+  {name:"Re-Bath SE",onboarder:"",archived:false,hs:{stage:"build_in_progress",seats:"3",am:""},meetings:[]},
   {name:"Ohio State Waterproofing",onboarder:"",archived:false,hs:{stage:"paid",seats:"15",am:1592156152},meetings:[]},
   {name:"Northbuilt Construction",onboarder:"",archived:false,hs:{stage:"driving_utilization",seats:"3",am:1592156152},meetings:[]},
   // ARCHIVED
@@ -438,7 +491,7 @@ function fc(){
     return(of==="All"||c.onboarder===of)&&(af==="All"||am===af)&&stMatch&&c.name.toLowerCase().includes(srch.toLowerCase());
   });
 }
-function cp(gi){const ph=phases[gi];const tot=ph.reduce((a,p)=>a+(p.id==="p2d"?0:p.tasks.length),0);const dn=ph.reduce((a,p)=>a+(p.id==="p2d"?0:p.tasks.filter(t=>t.complete||t.status==="Completed").length),0);return{tot,dn,pct:tot?Math.round(dn/tot*100):0};}
+function cp(gi){const ph=phases[gi];const tot=ph.filter(p=>p.id!=="p2d").reduce((a,p)=>a+p.tasks.length,0);const dn=ph.filter(p=>p.id!=="p2d").reduce((a,p)=>a+p.tasks.filter(t=>t.complete||t.status==="Completed").length,0);return{tot,dn,pct:tot?Math.round(dn/tot*100):0};}
 
 function renderSB(){
   const archCount=CLIENTS.filter(c=>c.archived).length;
@@ -470,6 +523,7 @@ function renderMain(){
   document.getElementById("ptf").style.width=pct+"%";
   document.getElementById("ppct").textContent=pct+"%";
   document.getElementById("tBoard").className="tb"+(tab==="board"?" ta":"");
+  document.getElementById("tGantt").className="tb"+(tab==="gantt"?" ta":"");
   document.getElementById("tMeet").className="tb"+(tab==="meetings"?" ta":"");
   document.getElementById("tIns").className="tb"+(tab==="insights"?" ta":"");
   const isC=view==="client";
@@ -507,7 +561,7 @@ ${cl.archived?'<div class="arch-banner">📁 Archived — '+stageLabel+'</div>':
   </div>
 </div>
 <hr class="card-divider">
-<div class="card-meta">
+<div class="card-meta" style="grid-template-columns:repeat(6,auto)">
   <div class="meta-block">
     <div class="meta-lbl">Status</div>
     <div class="meta-val" style="color:${stColor}">${stageLabel}</div>
@@ -519,6 +573,19 @@ ${cl.archived?'<div class="arch-banner">📁 Archived — '+stageLabel+'</div>':
   <div class="meta-block">
     <div class="meta-lbl">Build Time</div>
     <div class="meta-val" style="color:#4ade80">${(function(){var d=(EXTRAS[cl.name]||{}).buildStart;if(!d)return"—";var p=d.split("-");var start=new Date(+p[0],+p[1]-1,+p[2]);var today=new Date();today=new Date(today.getFullYear(),today.getMonth(),today.getDate());var days=Math.round((today-start)/86400000);return days+" day"+(days!==1?"s":"");}())}</div>
+  </div>
+  <div class="meta-block">
+    <div class="meta-lbl">Goal Go Live Date</div>
+    <div class="cal-wrap">
+      <button class="cal-btn glv${goLiveDates[cl.name]?'':' empty'}" id="cal-trigger-glv-${gi}" onclick="openCalFor('glv-${gi}',goLiveDates['${cl.name.replace(/'/g,"\'")}']||'',function(v){goLiveDates['${cl.name.replace(/'/g,"\'")}\']=v;renderMain();})">
+        ${goLiveDates[cl.name]?fmtDate(goLiveDates[cl.name]):'📅 Pick date'}
+      </button>
+      <div class="cal-drop" id="cal-drop-glv-${gi}"></div>
+    </div>
+  </div>
+  <div class="meta-block">
+    <div class="meta-lbl">Actual Go Live</div>
+    <div class="meta-val" style="color:${(EXTRAS[cl.name]||{}).goLiveActual?'#4ade80':'#374151'}">${(function(){var d=(EXTRAS[cl.name]||{}).goLiveActual;return d?fmtDate(d):'—';}())}</div>
   </div>
   <div class="meta-block">
     <div class="meta-lbl">Account Manager</div>
@@ -543,7 +610,12 @@ ${cl.onboarder?`<div class="meta-lbl" style="margin-bottom:5px">Onboarded By</di
     ph.forEach((phase,pi)=>{
       if(phase.id==="p2d") return; // Meetings are shown in the Meetings tab
       const dnt=phase.tasks.filter(t=>t.complete||t.status==="Completed").length;
-      h+=`<div><div class="ph-hdr" onclick="tgP(${gi},${pi})"><span class="ph-arr" style="color:${phase.color}">${phase.open?"▼":"▶"}</span><span class="ph-lbl" style="color:${phase.color}">${phase.label}</span><span class="ph-cnt">(${dnt}/${phase.tasks.length})</span></div>`;
+      const allDone=phase.tasks.length>0&&dnt===phase.tasks.length;
+      // Auto-collapse when fully complete
+      if(allDone&&phase.open===undefined) phase.open=false;
+      if(allDone&&phase._wasComplete!==true){phase.open=false;phase._wasComplete=true;}
+      if(!allDone){phase._wasComplete=false;}
+      h+=`<div><div class="ph-hdr" onclick="tgP(${gi},${pi})"><span class="ph-arr" style="color:${phase.color}">${phase.open?"▼":"▶"}</span><span class="ph-lbl" style="color:${allDone?"#4ade80":phase.color}">${phase.label}</span><span class="ph-cnt">${allDone?'<span style="color:#4ade80;font-weight:700">✓ Complete</span>':`(${dnt}/${phase.tasks.length})`}</span></div>`;
       if(phase.open){
           h+=`<div class="tw"><table><colgroup><col style="width:22px"><col style="width:20px"><col style="width:22%"><col style="width:95px"><col style="width:140px"><col style="width:100px"><col style="width:100px"><col style="width:95px"><col style="width:22px"></colgroup><thead><tr><th></th><th></th><th>Task</th><th style="text-align:center">Priority</th><th style="text-align:center">Status</th><th class="col-assigned" style="text-align:center">Assigned To</th><th class="col-goal" style="text-align:center">Goal Date</th><th class="col-completed" style="text-align:center">Completed</th><th></th></tr></thead><tbody>`;
           phase.tasks.forEach((task,ti)=>{
@@ -562,7 +634,12 @@ ${cl.onboarder?`<div class="meta-lbl" style="margin-bottom:5px">Onboarded By</di
 <td style="padding:3px 5px"><div style="background:${ps.bg};border-radius:5px;overflow:hidden"><select style="background:${ps.bg};color:${ps.t};border:none;font-weight:700;font-size:11px;padding:2px 5px;width:100%;outline:none;cursor:pointer" onchange="updP(${gi},${pi},${ti},this.value)">${prSel}</select></div></td>
 <td style="padding:3px 5px"><div class="sel-wrap"><select style="background:${ss.bg};color:${ss.t};border-color:#374151" onchange="updS(${gi},${pi},${ti},this.value)">${stSel}</select></div></td>
 <td class="col-assigned" style="padding:3px 5px">${occDL}<input list="occ-dl-${gi}-${pi}-${ti}" value="${task.occ||''}" placeholder="— assign —" style="font-size:11px;padding:2px 5px;background:#1a2030;border:1px solid #374151;border-radius:5px;color:#a78bfa;width:100%;outline:none" oninput="updO(${gi},${pi},${ti},this.value)"></td>
-<td class="col-goal" style="padding:3px 5px;text-align:center"><input type="date" value="${task.goalDate||""}" style="font-size:10px;padding:2px 4px;background:#1a2030;border:1px solid ${isOverdue?"#ef4444":"#374151"};border-radius:5px;color:${isOverdue?"#ef4444":"#9ca3af"};width:100%;outline:none;cursor:pointer" onchange="updGD(${gi},${pi},${ti},this.value)"></td>
+<td class="col-goal" style="padding:3px 5px;text-align:center"><div class="cal-wrap" style="width:100%">
+  <button class="cal-btn${isOverdue?' overdue':task.goalDate?'':' empty'}" id="cal-trigger-gd-${gi}-${pi}-${ti}" onclick="openCalFor('gd-${gi}-${pi}-${ti}','${task.goalDate||''}',function(v){updGD(${gi},${pi},${ti},v);})">
+    ${task.goalDate?fmtDate(task.goalDate):'—'}
+  </button>
+  <div class="cal-drop" id="cal-drop-gd-${gi}-${pi}-${ti}"></div>
+</div></td>
 <td class="col-completed" style="padding:3px 7px;text-align:center;font-size:10px;color:${task.completedDate?"#4ade80":"#374151"}">${task.completedDate||"—"}</td>
 <td style="text-align:center;padding:5px 3px"><div class="exb${task.comment?" hc":""}" onclick="tgC(${gi},${pi},${ti})"><span style="font-size:6px;color:${task.comment?"#60a5fa":"#4b5563"}">${task._open?"▲":"▼"}</span></div></td></tr>`;
             if(task._open){h+=`<tr class="cmt-row"><td colspan="9"><div class="cmt-lbl">Comment</div><textarea rows="2" placeholder="Add a comment..." onchange="updC(${gi},${pi},${ti},this.value)">${task.comment||""}</textarea></td></tr>`;}
@@ -572,6 +649,8 @@ ${cl.onboarder?`<div class="meta-lbl" style="margin-bottom:5px">Onboarded By</di
       }
       h+=`</div>`;
     });
+  }else if(tab==="gantt"){
+    h+=renderGantt(cl,ph,gi);
   }else if(tab==="insights"){
     // Build context from transcripts
     const allMeta=mMeta[cl.name]||{};
@@ -645,17 +724,232 @@ ${cl.onboarder?`<div class="meta-lbl" style="margin-bottom:5px">Onboarded By</di
 </div></div>`;});}
   }
   document.getElementById("mc").innerHTML=h;
+
 }
 
-function render(){renderSB();renderMain();if(document.getElementById("tIns"))document.getElementById("tIns").className="tb"+(tab==="insights"?" ta":"");}
+function render(){renderSB();renderMain();if(document.getElementById("tGantt"))document.getElementById("tGantt").className="tb"+(tab==="gantt"?" ta":"");if(document.getElementById("tIns"))document.getElementById("tIns").className="tb"+(tab==="insights"?" ta":"");}
 function selC(i){si=i;tab="board";render();if(window.innerWidth<=768)closeMobSidebar();}
 function setO(o){of=o;si=0;render();}
 function setA(a){af=a;si=0;render();}
 function setSt(s){stf=s;si=0;render();}
 function sv(v){view=v;document.getElementById("bInt").className="vb"+(v==="internal"?" va":"");document.getElementById("bCli").className="vb"+(v==="client"?" va":"");renderMain();}
+
+// ── GANTT CHART ───────────────────────────────────────────────
+function renderGantt(cl,ph,gi){
+  // Gather all dated items
+  const items=[];
+
+  // Task goal dates from phases
+  ph.forEach(function(phase){
+    if(phase.id==="p2d") return;
+    phase.tasks.forEach(function(task){
+      if(task.goalDate){
+        items.push({
+          label:task.task,
+          date:task.goalDate,
+          endDate:task.completedDate?task.completedDate.split(" ")[0]:task.goalDate,
+          type:"task",
+          phase:phase.label,
+          phaseColor:phase.color,
+          complete:task.complete||(task.status==="Completed")
+        });
+      }
+    });
+  });
+
+  // Meetings
+  cl.meetings.forEach(function(m){
+    items.push({
+      label:m.title,
+      date:m.date,
+      endDate:m.date,
+      type:"meeting",
+      phase:"Meetings",
+      phaseColor:"#60a5fa",
+      complete:true,
+      src:m.src
+    });
+  });
+
+  // Go live date
+  const glv=goLiveDates[cl.name];
+  if(glv){
+    items.push({label:"Goal Go Live",date:glv,endDate:glv,type:"golive",phase:"Milestones",phaseColor:"#a78bfa",complete:false});
+  }
+
+  if(!items.length){
+    return '<div class="gantt-empty">No dates set yet.<br><span style="font-size:11px;color:#4b5563">Add Goal Dates to tasks and meetings to see them here.</span></div>';
+  }
+
+  // Determine date range
+  const allDates=items.map(function(i){return i.date;}).filter(Boolean);
+  const today=new Date();today.setHours(0,0,0,0);
+  allDates.push(today.toISOString().slice(0,10));
+  if(glv)allDates.push(glv);
+
+  const minD=new Date(allDates.reduce(function(a,b){return a<b?a:b;}));
+  const maxD=new Date(allDates.reduce(function(a,b){return a>b?a:b;}));
+  // Pad by 7 days each side
+  minD.setDate(minD.getDate()-7);
+  maxD.setDate(maxD.getDate()+14);
+
+  const totalDays=Math.round((maxD-minD)/86400000)||1;
+
+  function pct(d){
+    if(!d)return 0;
+    var dd=new Date(d);dd.setHours(0,0,0,0);
+    return Math.max(0,Math.min(100,((dd-minD)/86400000)/totalDays*100));
+  }
+
+  const todayPct=pct(today.toISOString().slice(0,10));
+
+  // Build month header
+  var months=[];
+  var cur=new Date(minD);
+  while(cur<=maxD){
+    var key=cur.getFullYear()+"-"+(cur.getMonth()+1);
+    if(!months.length||months[months.length-1].key!==key){
+      months.push({key:key,label:cur.toLocaleString("default",{month:"short",year:"numeric"}),start:new Date(cur)});
+    }
+    cur.setDate(cur.getDate()+1);
+  }
+
+  // Group items by phase
+  var groups={};
+  var groupOrder=[];
+  items.forEach(function(item){
+    if(!groups[item.phase]){groups[item.phase]=[];groupOrder.push(item.phase);}
+    groups[item.phase].push(item);
+  });
+  // Sort each group by date
+  groupOrder.forEach(function(g){groups[g].sort(function(a,b){return a.date>b.date?1:-1;});});
+
+  // Render
+  var h='<div class="gantt-legend">';
+  h+='<div class="gantt-legend-dot" style="background:#4f46e5"></div><span>Task</span>';
+  h+='<div class="gantt-legend-dot" style="background:#60a5fa"></div><span>Meeting</span>';
+  h+='<div class="gantt-legend-dot" style="background:#a78bfa"></div><span>Go Live</span>';
+  h+='<div class="gantt-legend-dot" style="background:#4ade80"></div><span>Completed</span>';
+  h+='<div style="width:1px;height:10px;background:#ef4444;display:inline-block"></div><span>Today</span>';
+  h+='</div>';
+
+  h+='<div class="gantt-wrap"><table class="gantt-table"><thead><tr>';
+  h+='<th class="gantt-th label gantt-label-col">Task / Meeting</th>';
+  h+='<th class="gantt-th" style="padding:0"><div style="position:relative;height:24px">';
+  // Month labels
+  months.forEach(function(mo){
+    var startPct=pct(mo.start.toISOString().slice(0,10));
+    h+='<span style="position:absolute;left:'+startPct+'%;font-size:9px;color:#4b5563;font-weight:700;top:4px;padding-left:4px;white-space:nowrap">'+mo.label+'</span>';
+  });
+  h+='</div></th></tr></thead><tbody>';
+
+  groupOrder.forEach(function(groupName){
+    var gColor=groups[groupName][0].phaseColor;
+    h+='<tr class="gantt-row-ph"><td colspan="2" style="color:'+gColor+'">'+groupName+'</td></tr>';
+    groups[groupName].forEach(function(item){
+      var startP=pct(item.date);
+      var endP=pct(item.endDate||item.date);
+      if(endP<=startP)endP=startP+0.8;
+      var barW=(endP-startP);
+      var barColor=item.complete?"#4ade80":item.type==="meeting"?"#3b82f6":item.type==="golive"?"#a78bfa":item.phaseColor||"#4f46e5";
+      var fmtD=item.date?fmtDate(item.date):"";
+      h+='<tr class="gantt-row">';
+      h+='<td class="gantt-label-col"><span class="gantt-name'+(item.type==="meeting"?" meeting":"")+'">'+item.label+'</span><span style="font-size:9px;color:#374151;margin-left:5px">'+fmtD+'</span></td>';
+      h+='<td class="gantt-bar-cell">';
+      h+='<div style="position:absolute;inset:0">';
+      // Today line
+      h+='<div class="gantt-today" style="left:'+todayPct+'%"></div>';
+      // Bar
+      h+='<div class="gantt-bar" style="left:'+startP+'%;width:'+barW+'%;background:'+barColor+'" title="'+item.label+' · '+fmtD+'">'+item.label+'</div>';
+      h+='</div></td></tr>';
+    });
+  });
+
+  h+='</tbody></table></div>';
+  return h;
+}
+
+
+// ── CUSTOM CALENDAR PICKER ────────────────────────────────────
+var _calOpen=null;
+function openCal(id){
+  // Close any open calendar
+  if(_calOpen&&_calOpen!==id){
+    var prev=document.getElementById('cal-drop-'+_calOpen);
+    if(prev)prev.classList.remove('open');
+  }
+  _calOpen=id;
+  var drop=document.getElementById('cal-drop-'+id);
+  if(!drop)return;
+  if(drop.classList.contains('open')){drop.classList.remove('open');_calOpen=null;return;}
+  // Position below the button
+  var btn=document.getElementById('cal-trigger-'+id);
+  if(btn){
+    var r=btn.getBoundingClientRect();
+    drop.style.top=(r.bottom+4)+'px';
+    drop.style.left=Math.min(r.left,window.innerWidth-230)+'px';
+  }
+  drop.classList.add('open');
+}
+function closeCal(id){
+  var drop=document.getElementById('cal-drop-'+id);
+  if(drop)drop.classList.remove('open');
+  if(_calOpen===id)_calOpen=null;
+}
+document.addEventListener('click',function(e){
+  if(_calOpen&&!e.target.closest('.cal-wrap')&&!e.target.closest('.cal-drop')){
+    closeCal(_calOpen);
+  }
+});
+// Calendar state - store current picker state
+var _calState={};
+function buildCal(id,year,month){
+  var drop=document.getElementById('cal-drop-'+id);
+  if(!drop)return;
+  var state=_calState[id]||{};
+  var selDate=state.sel||'';
+  var months=['January','February','March','April','May','June','July','August','September','October','November','December'];
+  var days=['Su','Mo','Tu','We','Th','Fr','Sa'];
+  var today=new Date();today.setHours(0,0,0,0);
+  var first=new Date(year,month,1);
+  var startDay=first.getDay();
+  var daysInMonth=new Date(year,month+1,0).getDate();
+  var prevDays=new Date(year,month,0).getDate();
+  var prevY=month===0?year-1:year, prevM=month===0?11:month-1;
+  var nextY=month===11?year+1:year, nextM=month===11?0:month+1;
+  var h='<div class="cal-nav">';
+  h+='<button data-id="'+id+'" data-y="'+prevY+'" data-m="'+prevM+'" onclick="buildCal(this.dataset.id,+this.dataset.y,+this.dataset.m)">◀</button>';
+  h+='<span>'+months[month]+' '+year+'</span>';
+  h+='<button data-id="'+id+'" data-y="'+nextY+'" data-m="'+nextM+'" onclick="buildCal(this.dataset.id,+this.dataset.y,+this.dataset.m)">▶</button>';
+  h+='</div><div class="cal-grid">';
+  days.forEach(function(d){h+='<div class="cal-dh">'+d+'</div>';});
+  for(var i=startDay-1;i>=0;i--){h+='<div class="cal-d other">'+(prevDays-i)+'</div>';}
+  for(var d=1;d<=daysInMonth;d++){
+    var dt=new Date(year,month,d);dt.setHours(0,0,0,0);
+    var iso=year+'-'+String(month+1).padStart(2,'0')+'-'+String(d).padStart(2,'0');
+    var cls='cal-d'+(dt.getTime()===today.getTime()?' today':'')+(iso===selDate?' sel':'');
+    h+='<div class="'+cls+'" data-id="'+id+'" data-iso="'+iso+'" onclick="pickCalDate(this.dataset.id,this.dataset.iso)">'+d+'</div>';
+  }
+  var total=startDay+daysInMonth,rem=total%7===0?0:7-total%7;
+  for(var n=1;n<=rem;n++){h+='<div class="cal-d other">'+n+'</div>';}
+  h+='</div><button class="cal-clear" data-id="'+id+'" onclick="pickCalDate(this.dataset.id,\'\')">✕ Clear date</button>';
+  drop.innerHTML=h;
+}
+function pickCalDate(id,iso){
+  closeCal(id);
+  var state=_calState[id];
+  if(state&&state.cb)state.cb(iso);
+}
+function openCalFor(id,selDate,cb){
+  _calState[id]={sel:selDate,cb:cb};
+  var d=selDate?new Date(selDate+'T00:00:00'):new Date();
+  buildCal(id,d.getFullYear(),d.getMonth());
+  openCal(id);
+}
 function setTab(t){
   tab=t;
   document.getElementById("tBoard").className="tb"+(t==="board"?" ta":"");
+  document.getElementById("tGantt").className="tb"+(t==="gantt"?" ta":"");
   document.getElementById("tMeet").className="tb"+(t==="meetings"?" ta":"");
   document.getElementById("tIns").className="tb"+(t==="insights"?" ta":"");
   renderMain();
@@ -854,6 +1148,7 @@ document.addEventListener("click",function(e){
     document.querySelectorAll('[id^="dd-links-"],[id^="dd-contacts-"]').forEach(el=>el.style.display="none");
   }
 });
+// updGLV now handled inline in calendar callback
 function updTN(gi,pi,ti,v){phases[gi][pi].tasks[ti].task=v;}
 function tgP(gi,pi){phases[gi][pi].open=!phases[gi][pi].open;renderMain();}
 function tgT(gi,pi,ti){
@@ -880,7 +1175,13 @@ function updS(gi,pi,ti,v){
   renderMain();
 }
 function updO(gi,pi,ti,v){phases[gi][pi].tasks[ti].occ=v;}
-function updGD(gi,pi,ti,v){phases[gi][pi].tasks[ti].goalDate=v;renderMain();}
+function updGD(gi,pi,ti,v){
+  phases[gi][pi].tasks[ti].goalDate=v;
+  // Update button label in place without full re-render
+  var btn=document.querySelector('#gd-'+gi+'-'+pi+'-'+ti+' ~ button, #gd-'+gi+'-'+pi+'-'+ti);
+  // Re-render to sync Gantt etc
+  renderMain();
+}
 let _delGi,_delPi,_delTi;
 function delT(gi,pi,ti){
   _delGi=gi;_delPi=pi;_delTi=ti;
