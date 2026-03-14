@@ -196,6 +196,41 @@ textarea{width:100%;font-size:11px;padding:5px 8px;background:#111827;border:1px
   /* Meta 2-col stays but smaller gap */
   .card-meta{gap:8px}
 }
+
+/* ── INSIGHTS TAB ────────────────────────────────────────── */
+.ins-wrap{display:flex;flex-direction:column;height:100%;gap:11px}
+.ins-empty{display:flex;flex-direction:column;align-items:center;justify-content:center;height:60%;gap:10px;color:#4b5563;font-size:12px;text-align:center}
+.ins-empty-icon{font-size:32px;opacity:.35}
+.sq-grid{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:4px}
+.sq{font-size:11px;padding:5px 10px;cursor:pointer;background:#1a2030;border:1px solid #374151;border-radius:20px;color:#9ca3af;line-height:1.3}
+.sq:hover{border-color:#a78bfa;color:#a78bfa}
+.chat-log{flex:1;overflow-y:auto;display:flex;flex-direction:column;gap:8px;min-height:0}
+.chat-log::-webkit-scrollbar{width:3px}
+.chat-log::-webkit-scrollbar-thumb{background:#374151;border-radius:2px}
+.chat-bubble{max-width:88%;padding:9px 13px;border-radius:10px;font-size:12px;line-height:1.6;white-space:pre-wrap;word-break:break-word}
+.cb-user{align-self:flex-end;background:#4f46e5;color:#fff;border-radius:10px 10px 3px 10px}
+.cb-ai{align-self:flex-start;background:#1e2433;border:1px solid #374151;color:#e5e7eb;border-radius:10px 10px 10px 3px}
+.cb-err{align-self:flex-start;background:#4a000040;border:1px solid #ef4444;color:#f87171;border-radius:8px;font-size:11px;padding:7px 11px}
+.cb-thinking{align-self:flex-start;background:#1e2433;border:1px solid #374151;color:#6b7280;border-radius:10px 10px 10px 3px;font-style:italic}
+.chat-input-row{display:flex;gap:7px;align-items:flex-end;flex-shrink:0}
+.chat-textarea{flex:1;font-size:12px;padding:8px 11px;background:#1e2433;border:1px solid #374151;border-radius:8px;color:#f9fafb;resize:none;outline:none;line-height:1.5;font-family:inherit}
+.chat-textarea:focus{border-color:#4f46e5}
+.chat-send{font-size:12px;font-weight:600;padding:8px 14px;background:#4f46e5;color:#fff;border:none;border-radius:8px;cursor:pointer;flex-shrink:0;align-self:stretch}
+.chat-send:disabled{background:#1f2937;color:#4b5563;cursor:not-allowed}
+.chat-clear{font-size:11px;padding:6px 10px;background:none;border:1px solid #374151;border-radius:6px;color:#4b5563;cursor:pointer;flex-shrink:0}
+.chat-clear:hover{color:#f9fafb;border-color:#6b7280}
+/* Meeting labels */
+.mat-sel{font-size:10px;padding:2px 5px;background:#1a2030;border:1px solid #374151;border-radius:5px;color:#a78bfa;outline:none;cursor:pointer;max-width:130px}
+.mat-sel:focus{border-color:#4f46e5}
+.att-badge{font-size:9px;font-weight:700;padding:2px 7px;border-radius:10px;border:1px solid;white-space:nowrap}
+.att-attended{background:#14532d40;color:#4ade80;border-color:#4ade8040}
+.att-canceled{background:#450a0a40;color:#f87171;border-color:#f8717140}
+.att-postponed{background:#78350f40;color:#fbbf24;border-color:#fbbf2440}
+.att-pending{background:#1e3a5f40;color:#60a5fa;border-color:#60a5fa40}
+/* Transcript field */
+.tx-toggle{font-size:10px;padding:2px 8px;background:#1a2030;border:1px solid #374151;border-radius:4px;color:#6b7280;cursor:pointer;flex-shrink:0}
+.tx-toggle.has{border-color:#4ade8040;color:#4ade80;background:#14532d40}
+.tx-area{width:100%;font-size:10px;padding:6px 8px;background:#0d1117;border:1px solid #374151;border-radius:5px;color:#9ca3af;resize:vertical;outline:none;font-family:monospace;line-height:1.5;margin-top:5px;min-height:80px}
 </style>
 </head>
 <body style="margin:0;padding:0;height:100vh;overflow:hidden">
@@ -216,7 +251,7 @@ textarea{width:100%;font-size:11px;padding:5px 8px;background:#111827;border:1px
   <div class="clist" id="clist"></div>
   <button class="arch-toggle" onclick="toggleArch()" id="archBtn">📁 Show Archived (0)</button>
 
-  <div class="sb-footer" id="synctime">Last synced: 3:13 PM ET · Mar 13, 2026</div>
+  <div class="sb-footer" id="synctime">Last synced: Live · Mar 14, 2026</div>
 </div>
 <div class="main">
   <div class="topbar">
@@ -227,6 +262,7 @@ textarea{width:100%;font-size:11px;padding:5px 8px;background:#111827;border:1px
     <div class="tabs">
       <button class="tb ta" id="tBoard" onclick="setTab('board')">Board</button>
       <button class="tb" id="tMeet" onclick="setTab('meetings')">Meetings</button>
+      <button class="tb" id="tIns" onclick="setTab('insights')">✦ Insights</button>
     </div>
   </div>
   <div class="content" id="mc"></div>
@@ -245,6 +281,12 @@ textarea{width:100%;font-size:11px;padding:5px 8px;background:#111827;border:1px
   </div>
 </div>
 <script>
+// ── ANTHROPIC API KEY ─────────────────────────────────────
+// Paste your Anthropic API key here for the Insights tab to work.
+// Get one at: https://console.anthropic.com/settings/keys
+// Tip: set a monthly spend limit on the key for safety.
+const ANTHROPIC_KEY = "YOUR_API_KEY_HERE";
+
 const SM={
   driving_utilization:{l:"Driving Utilization",c:"#f472b6"},
   build_in_progress:{l:"Build In Progress",c:"#60a5fa"},
@@ -260,8 +302,19 @@ const SM={
   collections:{l:"Collections",c:"#dc2626"}
 };
 const ACTIVE_STAGES=new Set(["paid","waiting_on_materials","build_in_progress","build_completed","training_scheduled","driving_utilization"]);
-const OM={46491757:"Paul Gervasi",81817361:"Nico Valenzuela",173758648:"Philip Jacobs",173757457:"Taylor Mastin",495868686:"Chance Ray",644465735:"Alan May",116399656:"Chad Hunt",1592156152:"Josh Tazzetta",63601710:"Jesse Mayek",51013924:"Levi Bond",83451467:"Cara Landolt"};
+const OM={46491757:"Paul Gervasi",81817361:"Nico Valenzuela",173758648:"Philip Jacobs",173757457:"Taylor Mastin",495868686:"Chance Ray",644465735:"Alan May",116399656:"Chad Hunt",1592156152:"Josh Tazzetta",63601710:"Jesse Mayek",51013924:"Levi Bond",83451467:"Cara Landolt",67580456:"Ashley Chavez",62198195:"Bill Willcome",45550132:"Bryce Rutzke",30976993:"Joe McGinnis",124960031:"David Julio Alvarez",871380365:"Austin Conway",75702576:"Elizabeth Gervasi"};
 const EXTRAS={"Lunar Audio Video LLC":{"id":"4501","hsId":"50813295245","dropbox":"","contacts":[{"n":"Chris Young","t":"Managing Director","e":"cyoung@lunarav.com","p":""}],"buildStart":"2026-03-06"},"Top Tier":{"id":"4489","hsId":"49070841256","dropbox":"","contacts":[{"n":"Jordon Winters","t":"","e":"jordon@toptierhbs.net","p":"8134532747"},{"n":"Shermal Thomas","t":"Office Assistant","e":"shermal@toptierhbs.net","p":"8138023378"}]},"Re-Bath of Augusta":{"id":"","hsId":"","dropbox":"","contacts":[]},"Alta Windows & Door":{"id":"4473","hsId":"48192452487","dropbox":"","contacts":[{"n":"Steven Juker","t":"Director of Operations","e":"sjuker@altawindowdoor.com","p":"2083512219"},{"n":"msessa","t":"","e":"msessa@altawindowdoor.com","p":""}]},"Affordable Windows and Roofing":{"id":"","hsId":"","dropbox":"","contacts":[]},"SuperFast Kitchen and Bath":{"id":"","hsId":"","dropbox":"","contacts":[]},"Elia Bathroom Designs":{"id":"","hsId":"","dropbox":"","contacts":[]},"Cypress Bath":{"id":"","hsId":"","dropbox":"","contacts":[]},"Jay Bee Contracting":{"id":"4399","hsId":"52910956374","dropbox":"","contacts":[{"n":"Justin Britton","t":"President","e":"jbritton@jaybeecontracting.com","p":"585-880-3457"}],"buildStart":"2025-09-09"},"Quick Bath Solutions":{"id":"","hsId":"","dropbox":"","contacts":[]},"XPRT Outdoor":{"id":"","hsId":"","dropbox":"","contacts":[]},"Custom Services Co LLC":{"id":"4262","hsId":"30228214800","dropbox":"","contacts":[{"n":"Rick Eavenson","t":"Certified Aging-in-Place Specialist","e":"rick@customservicescollc.com","p":"9012033241"}]},"Lux Design Builds":{"id":"3871","hsId":"31640417068","dropbox":"","contacts":[{"n":"Marcin Wyszomirski","t":"Interior Designer","e":"marcin@luxdesignbuilds.com","p":"","hsContactId":"150617853474"},{"n":"Sydney Mukwacha","t":"Office Manager","e":"officemgr@luxdesignbuilds.com","p":"4254358936","hsContactId":"32852142618"}],"buildStart":"2024-05-15"},"STL Roof Pros":{"id":"","hsId":"","dropbox":"","contacts":[]},"Virginia Bath Works Inc.":{"id":"","hsId":"","dropbox":"","contacts":[]},"Rebath San Antonio":{"id":"","hsId":"","dropbox":"","contacts":[]},"Dominican Outdoor Solutions":{"id":"","hsId":"","dropbox":"","contacts":[]},"Refined Spaces LLC":{"id":"","hsId":"","dropbox":"","contacts":[]},"MOD Bath USA":{"id":"","hsId":"","dropbox":"","contacts":[]},"Go Roofing":{"id":"","hsId":"","dropbox":"","contacts":[]},"Window Depot USA of Fort Wayne":{"id":"","hsId":"","dropbox":"","contacts":[]},"Bath Planet of Paducah":{"id":"4286","hsId":"31622601557","dropbox":"","contacts":[],"buildStart":"2025-05-30"},"Donaway Bath":{"id":"4263","hsId":"30269165230","dropbox":"","contacts":[{"n":"Galen Gardner","t":"Owner","e":"galen@donaway.com","p":"4437831710","hsContactId":"100917225250"}],"buildStart":"2025-03-12"},"Re-Bath of New England":{"id":"4256","hsId":"29688847148","dropbox":"","contacts":[{"n":"Bill Trombly","t":"Owner","e":"bill.trombly@rebath.com","p":"6032353433","hsContactId":"174117297571"},{"n":"Jordan Trombly","t":"General Manager","e":"jordan.trombly@rebath.com","p":"6036250303","hsContactId":"96918250648"},{"n":"Jeff McCormack","t":"Sales Manager","e":"jeff.mccormack@rebath.com","p":"6036250303","hsContactId":"104030483573"},{"n":"Susan Oliver","t":"VP of Operations","e":"susan.oliver@rebath.com","p":"4322039736"}],"buildStart":"2025-03-12"},"Legacy Design & Remodeling":{"id":"","hsId":"","dropbox":"","contacts":[]},"Stonebridge Kitchen and Bath LLC":{"id":"4490","hsId":"51139252400","dropbox":"","contacts":[{"n":"Gage Smith","t":"Co-Founder","e":"gagesmith@stonebridgekitchenandbath.com","p":"3522742679"}]},"4D Custom Builders":{"id":"","hsId":"","dropbox":"","contacts":[]},"Bathrooms of Charleston":{"id":"","hsId":"","dropbox":"","contacts":[]},"Lotus Kitchen & Bath":{"id":"","hsId":"","dropbox":"","contacts":[]},"Fortress Roofing":{"id":"","hsId":"","dropbox":"","contacts":[]},"Backyard Fun Pools":{"id":"","hsId":"","dropbox":"","contacts":[]},"Paramount Xterior":{"id":"4282","hsId":"30987093852","dropbox":"","contacts":[{"n":"Ian Ally","t":"Owner","e":"ianally@paramountxterior.com","p":"2404058648"},{"n":"Bryan Puglio","t":"","e":"bpuglio@paramountxterior.com","p":""}]},"Well Decor LLC":{"id":"4243","hsId":"29699866979","dropbox":"","contacts":[{"n":"Yuan Zhou","t":"Owner","e":"yuan@well-decor.com","p":"8586036486","hsContactId":"97697525762"}],"buildStart":"2025-02-18"},"Welcome Renovation":{"id":"4237","hsId":"29642322250","dropbox":"","contacts":[{"n":"Greg Takeshita","t":"Founder","e":"greg@welcomerenovation.com","p":"9493389960"},{"n":"Lukus Meulink","t":"Director of Project Management","e":"lukus.meulink@welcomerenovation.com","p":"3108032496"}],"buildStart":"2025-02-17"},"Sunshine Contracting Corporation":{"id":"3815","hsId":"42249021846","dropbox":"","contacts":[{"n":"Ryan Sabo","t":"Owner","e":"rsabo@sunshinecontractingcorp.com","p":"7034892691"},{"n":"Crawford Conniff","t":"Sales Manager","e":"cconniff@sunshinecontractingcorp.com","p":"7034998654"},{"n":"Nate Sullivan","t":"VP of Operations","e":"nsullivan@sunshinecontractingcorp.com","p":"7034998654"}],"buildStart":"2024-04-01"},"Platinum Roofing Construction":{"id":"4273","hsId":"29201891909","dropbox":"","contacts":[{"n":"Jason Bye","t":"","e":"jbye.grs@gmail.com","p":"5079511465","hsContactId":"94790742870"}],"buildStart":"2025-03-17"},"SE Property Group":{"id":"4258","hsId":"30345736117","dropbox":"","contacts":[]},"Quality Sheet Metal Heating & Air Inc.":{"id":"4279","hsId":"31701952826","dropbox":"","contacts":[{"n":"John McNamee","t":"","e":"qualityshtmetal7@gmail.com","p":"9169189920"},{"n":"Tonya McNamee","t":"CFO","e":"tmcnamee@comehometoquality.com","p":"9169189920"}]},"Re-Bath Midland":{"id":"4231","hsId":"36417221527","dropbox":"","contacts":[{"n":"Henry Wall","t":"Owner","e":"henry.wall@rebath.com","p":"8063192213"},{"n":"Susan Oliver","t":"VP of Operations","e":"susan.oliver@rebath.com","p":"4322039736"}],"buildStart":"2025-02-04"},"Pacific Coast Re-Bath":{"id":"4270","hsId":"30589147820","dropbox":"","contacts":[{"n":"susan engbrecht","t":"","e":"mstorms@pcrebath.com","p":"8184896351","hsContactId":"105064119878"}],"buildStart":"2025-03-26"},"Lutton Construction":{"id":"4269","hsId":"30350664301","dropbox":"","contacts":[{"n":"Kyle Lutton","t":"Owner","e":"kyle@luttonco.com","p":"6149802281"},{"n":"Raymond Perez","t":"Production Manager","e":"raymond@luttonco.com","p":"5622212165"}]},"Task Masters Handyman Services Inc":{"id":"4274","hsId":"30426563492","dropbox":"","contacts":[{"n":"Chris Deanovic","t":"COO","e":"chrisd@tmimn.com","p":"6128367808"},{"n":"Calvin Schiltz","t":"","e":"calvins@tmimn.com","p":""}]},"MODE Renovation LLC":{"id":"3983","hsId":"42249819261","dropbox":"","contacts":[{"n":"Ryan Keene","t":"CEO","e":"rkeene@moderenovation.com","p":"7148847498"},{"n":"Linda Miller","t":"Sales Manager","e":"lmiller@moderenovation.com","p":"9257195101"}],"buildStart":"2024-09-03"},"Potomac Custom Remodeling":{"id":"4284","hsId":"31030356805","dropbox":"","contacts":[{"n":"anthony marks","t":"Implementation Director","e":"anthony@potomaccustomremodeling.com","p":"3017606869","hsContactId":"105845219730"},{"n":"Cory Minzyk","t":"VP of Marketing","e":"cory.minzyk@potomaccustomremodeling.com","p":"7034050904","hsContactId":"194982850060"}],"buildStart":"2025-03-26"},"Home Pros Remodeling":{"id":"4247","hsId":"30080307989","dropbox":"","contacts":[{"n":"Dan Reyes","t":"Owner","e":"danr@homepros-usa.com","p":"5056006783","hsContactId":"100132375114"},{"n":"Jason Balthrop","t":"General Manager","e":"jasonb@homepros-usa.com","p":"5053626276","hsContactId":"100149126728"},{"n":"James Culwell","t":"Sales Manager","e":"jculwell@homepros-usa.com","p":"3603938935","hsContactId":"109428761121"}],"buildStart":"2025-03-05"},"Timber Ridge Roofing & Exteriors":{"id":"4278","hsId":"31071289206","dropbox":"","contacts":[{"n":"Kyler McCarty","t":"Owner","e":"kmccarty@timberridgeroof.com","p":"7125718089"}]},"Big Country Exteriors":{"id":"4277","hsId":"29631079787","dropbox":"","contacts":[{"n":"Timothy Dascenzo","t":"Owner","e":"tim@bigcountryexteriors.com","p":"6094915334"}]},"Baths by Bill":{"id":"4256","hsId":"29688847148","dropbox":"","contacts":[],"buildStart":"2025-03-12"},"Legacy Exteriors":{"id":"3965","hsId":"21963237464","dropbox":"","contacts":[{"n":"Jeremy Bibb","t":"Owner","e":"jeremy@legacyexteriorstx.com","p":"5126631864","hsContactId":"40285839188"},{"n":"Stephen Hines","t":"Sales Manager","e":"stephen@legacyexteriorstx.com","p":"5126631864","hsContactId":"40285839190"}],"buildStart":"2024-07-23"},"Design Surfaces":{"id":"4232","hsId":"34585614357","dropbox":"","contacts":[{"n":"Nick Benvenuto","t":"Owner / Lead Designer","e":"nick@designsurfacesmi.com","p":"6164058011"},{"n":"Kurt Schlosser","t":"Showroom Manager","e":"kurt@designsurfacesmi.com","p":"7346360750"}],"buildStart":"2025-02-13"},"DC Enclosures, Inc.":{"id":"4239","hsId":"29675275418","dropbox":"","contacts":[{"n":"Tamara DeSantis","t":"Operations Manager","e":"tamarade@dcenclosures.com","p":"6785284946"}],"buildStart":"2025-02-19"},"BathHound":{"id":"4478","hsId":"47580838193","dropbox":"","contacts":[{"n":"Esi Medina","t":"GM","e":"esi.medina@bathhound.com","p":"7205467256"},{"n":"Jon Stucky","t":"","e":"jon.stucky@bathhound.com","p":""},{"n":"Heather Meyers","t":"Salesrep","e":"heather.meyers@bathhound.com","p":""}]}};
+
+const MTYPES=["Discovery","Kick-Off Call","Build Review","Admin Training","Sales Training","Team Training","Retention"];
+const ASTATUS=["Attended","Canceled","Postponed"];
+const ASTY={Attended:"att-attended",Canceled:"att-canceled",Postponed:"att-postponed"};
+// Per-meeting extra state: meetingType, attendanceStatus, transcriptUrl, transcript
+// Stored as mMeta[clientName][meetingIndex]
+const mMeta={};
+function getMeta(cname,mi){if(!mMeta[cname])mMeta[cname]={};if(!mMeta[cname][mi])mMeta[cname][mi]={mtype:"",att:"Attended",txUrl:"",transcript:""};return mMeta[cname][mi];}
+function setMeta(cname,mi,key,val){getMeta(cname,mi)[key]=val;}
+function fmtDate(d){if(!d)return"–";const p=d.split("-");const m=["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];return m[parseInt(p[1])-1]+" "+parseInt(p[2])+", "+p[0];}
+function isFuture(d){return d&&new Date(d+"T00:00:00")>new Date();}
 const PS={Critical:{bg:"#dc2626",t:"#fff"},High:{bg:"#f97316",t:"#fff"},Medium:{bg:"#eab308",t:"#1a1a00"},Low:{bg:"#22c55e",t:"#fff"}};
 const SS={"Not Started":{bg:"#1f2937",t:"#9ca3af"},"In Progress - OCC":{bg:"#1e3a5f",t:"#60a5fa"},"In Progress - Customer":{bg:"#1a2e1a",t:"#4ade80"},"Completed":{bg:"#14532d",t:"#4ade80"},"Blocked":{bg:"#4a0000",t:"#f87171"},"":{bg:"#111827",t:"#4b5563"}};
 
@@ -276,33 +329,33 @@ const PT=[
   {id:"p3",label:"Phase 3 – Go Live!",color:"#15803d",tasks:[{task:"Final Feedback Meeting",priority:"Critical",status:"Not Started",occ:"",goalDate:"",completedDate:"",comment:"",_open:false,complete:false},{task:"Build Sign Off",priority:"Critical",status:"",occ:"",goalDate:"",completedDate:"",comment:"",_open:false,complete:false},{task:"Sales Team Training",priority:"Critical",status:"Not Started",occ:"",goalDate:"",completedDate:"",comment:"",_open:false,complete:false}]}
 ];
 
-// === LIVE CLIENT DATA (synced Mar 13, 2026) ===
+// === LIVE CLIENT DATA (synced Mar 14, 2026) ===
 const CLIENTS=[
   // PAUL GERVASI
-  {name:"Lunar Audio Video LLC",onboarder:"Paul Gervasi",archived:false,hs:{stage:"build_in_progress",seats:"3",am:644465735},meetings:[{date:"2026-03-06",title:"Kickoff Call",dur:"60 min",src:"zoom",att:[{n:"Alan May",t:"OCC",e:""},{n:"Paul Gervasi",t:"OCC",e:""},{n:"Chris Young",t:"Owner",e:""}]},{date:"2026-03-17",title:"Lunar Audio (Struxure)",dur:"60 min",src:"zoom",att:[{n:"Paul Gervasi",t:"OCC",e:""}]}]},
+  {name:"Lunar Audio Video LLC",onboarder:"Paul Gervasi",archived:false,hs:{stage:"build_completed",seats:"3",am:644465735},meetings:[{date:"2026-03-06",title:"Kickoff Call",dur:"60 min",src:"zoom",att:[{n:"Alan May",t:"OCC",e:""},{n:"Paul Gervasi",t:"OCC",e:""},{n:"Chris Young",t:"Owner",e:""}]},{date:"2026-03-17",title:"Lunar Audio (Struxure)",dur:"60 min",src:"zoom",att:[{n:"Paul Gervasi",t:"OCC",e:""}]}]},
   {name:"Top Tier",onboarder:"Paul Gervasi",archived:false,hs:{stage:"build_completed",seats:"2",am:495868686},meetings:[{date:"2026-02-11",title:"Top Tier Kickoff",dur:"60 min",src:"gong",att:[{n:"Paul Gervasi",t:"OCC",e:""},{n:"Jordon Winters",t:"Owner",e:""}]},{date:"2026-02-18",title:"Top Tier Weekly",dur:"60 min",src:"gong",att:[{n:"Paul Gervasi",t:"OCC",e:""}]},{date:"2026-02-25",title:"Top Tier Weekly",dur:"60 min",src:"gong",att:[{n:"Paul Gervasi",t:"OCC",e:""}]}]},
   {name:"Re-Bath of Augusta",onboarder:"Paul Gervasi",archived:false,hs:{stage:"driving_utilization",seats:"3",am:495868686},meetings:[{date:"2026-02-12",title:"Re-Bath Augusta",dur:"30 min",src:"zoom",att:[{n:"Paul Gervasi",t:"OCC",e:""},{n:"Jim Sigg",t:"Owner",e:""}]}]},
   {name:"Alta Windows & Door",onboarder:"Paul Gervasi",archived:false,hs:{stage:"waiting_on_materials",seats:"11",am:644465735},meetings:[{date:"2026-01-09",title:"Alta Kickoff Call",dur:"60 min",src:"gong",att:[{n:"Alan May",t:"OCC",e:""},{n:"Paul Gervasi",t:"OCC",e:""},{n:"Steven Juker",t:"Dir of Ops",e:""}]},{date:"2026-02-10",title:"Alta Window and Door",dur:"60 min",src:"gong",att:[{n:"Alan May",t:"OCC",e:""},{n:"Paul Gervasi",t:"OCC",e:""}]}]},
   {name:"Affordable Windows and Roofing",onboarder:"Paul Gervasi",archived:false,hs:{stage:"driving_utilization",seats:"0",am:1592156152},meetings:[]},
   {name:"SuperFast Kitchen and Bath",onboarder:"Paul Gervasi",archived:false,hs:{stage:"driving_utilization",seats:"4",am:644465735},meetings:[{date:"2026-01-21",title:"SuperFast Kickoff",dur:"60 min",src:"zoom",att:[{n:"Alan May",t:"OCC",e:""},{n:"Paul Gervasi",t:"OCC",e:""},{n:"Jesse Koerner",t:"Owner",e:""}]},{date:"2026-02-11",title:"SuperFast Kitchens",dur:"30 min",src:"gong",att:[{n:"Paul Gervasi",t:"OCC",e:""}]}]},
-  {name:"Elia Bathroom Designs",onboarder:"Paul Gervasi",archived:false,hs:{stage:"build_in_progress",seats:"3",am:495868686},meetings:[]},
+  {name:"Elia Bathroom Designs",onboarder:"Paul Gervasi",archived:false,hs:{stage:"build_completed",seats:"3",am:495868686},meetings:[]},
   {name:"Cypress Bath",onboarder:"Paul Gervasi",archived:false,hs:{stage:"driving_utilization",seats:"3",am:63601710},meetings:[{date:"2025-09-05",title:"Kickoff Call",dur:"30 min",src:"zoom",att:[{n:"Paul Gervasi",t:"OCC",e:""},{n:"Chris Lavoie",t:"Owner",e:""}]},{date:"2026-03-05",title:"Cypress Bath",dur:"30 min",src:"zoom",att:[{n:"Paul Gervasi",t:"OCC",e:""}]}]},
   {name:"Jay Bee Contracting",onboarder:"Paul Gervasi",archived:false,hs:{stage:"driving_utilization",seats:"5",am:495868686},meetings:[{date:"2026-01-14",title:"Jay Bee Contracting",dur:"60 min",src:"gong",att:[{n:"Paul Gervasi",t:"OCC",e:""},{n:"Justin Britton",t:"President",e:""}]},{date:"2026-03-12",title:"Jay Bee Retraining",dur:"30 min",src:"gong",att:[{n:"Paul Gervasi",t:"OCC",e:""}]}]},
   {name:"Quick Bath Solutions",onboarder:"Paul Gervasi",archived:false,hs:{stage:"driving_utilization",seats:"2",am:1592156152},meetings:[{date:"2025-06-04",title:"OCC Welcome Call",dur:"30 min",src:"zoom",att:[{n:"Paul Gervasi",t:"OCC",e:""},{n:"Jarrett Steele",t:"PM",e:""}]}]},
   {name:"XPRT Outdoor",onboarder:"Paul Gervasi",archived:false,hs:{stage:"driving_utilization",seats:"5",am:644465735},meetings:[{date:"2025-09-02",title:"XPRT Outdoor",dur:"30 min",src:"zoom",att:[{n:"Paul Gervasi",t:"OCC",e:""},{n:"Daniel Murokh",t:"GM",e:""}]}]},
-  {name:"Custom Services Co LLC",onboarder:"Paul Gervasi",archived:false,hs:{stage:"driving_utilization",seats:"3",am:46491757},meetings:[{date:"2026-02-18",title:"Custom Services LLC",dur:"60 min",src:"gong",att:[{n:"Paul Gervasi",t:"OCC",e:""},{n:"Rick Eavenson",t:"Owner",e:""}]}]},
+  {name:"Custom Services Co LLC",onboarder:"Paul Gervasi",archived:false,hs:{stage:"driving_utilization",seats:"3",am:30976993},meetings:[{date:"2026-02-18",title:"Custom Services LLC",dur:"60 min",src:"gong",att:[{n:"Paul Gervasi",t:"OCC",e:""},{n:"Rick Eavenson",t:"Owner",e:""}]}]},
   {name:"Lux Design Builds",onboarder:"Paul Gervasi",archived:false,hs:{stage:"build_completed",seats:"3",am:495868686},meetings:[{date:"2025-07-03",title:"Lux Design Builds",dur:"30 min",src:"zoom",att:[{n:"Paul Gervasi",t:"OCC",e:""},{n:"Marcin Wyszomirski",t:"Designer",e:""}]}]},
   // PHILIP JACOBS
   {name:"STL Roof Pros",onboarder:"Philip Jacobs",archived:false,hs:{stage:"driving_utilization",seats:"3",am:644465735},meetings:[{date:"2026-02-04",title:"Kickoff Call",dur:"38 min",src:"zoom",att:[]},{date:"2026-02-06",title:"Build Kickoff",dur:"30 min",src:"gong",att:[]}]},
-  {name:"Virginia Bath Works Inc.",onboarder:"Philip Jacobs",archived:false,hs:{stage:"build_in_progress",seats:"3",am:644465735},meetings:[{date:"2026-01-28",title:"Kickoff Call",dur:"40 min",src:"zoom",att:[]}]},
+  {name:"Virginia Bath Works Inc.",onboarder:"Philip Jacobs",archived:false,hs:{stage:"build_completed",seats:"3",am:644465735},meetings:[{date:"2026-01-28",title:"Kickoff Call",dur:"40 min",src:"zoom",att:[]}]},
   {name:"Rebath San Antonio",onboarder:"Philip Jacobs",archived:false,hs:{stage:"driving_utilization",seats:"2",am:495868686},meetings:[{date:"2025-11-18",title:"Kickoff Call",dur:"44 min",src:"zoom",att:[]},{date:"2026-01-14",title:"Build Complete",dur:"33 min",src:"gong",att:[]}]},
   {name:"Dominican Outdoor Solutions, SRL",onboarder:"Philip Jacobs",archived:false,hs:{stage:"driving_utilization",seats:"3",am:1592156152},meetings:[{date:"2025-11-07",title:"Kickoff Call",dur:"38 min",src:"zoom",att:[]}]},
   {name:"Refined Spaces LLC",onboarder:"Philip Jacobs",archived:false,hs:{stage:"driving_utilization",seats:"3",am:63601710},meetings:[{date:"2025-11-07",title:"Kickoff Call",dur:"45 min",src:"zoom",att:[]}]},
-  {name:"MOD Bath USA",onboarder:"Philip Jacobs",archived:false,hs:{stage:"driving_utilization",seats:"3",am:63601710},meetings:[{date:"2025-07-02",title:"Kick Off – Mod Bath",dur:"30 min",src:"gong",att:[{n:"Philip Jacobs",t:"OCC",e:""},{n:"Sam Rydell",t:"CEO",e:""}]}]},
-  {name:"Go Roofing",onboarder:"Philip Jacobs",archived:false,hs:{stage:"driving_utilization",seats:"3",am:116399656},meetings:[{date:"2025-11-06",title:"Kickoff Call",dur:"38 min",src:"zoom",att:[]}]},
+  {name:"MOD Bath USA",onboarder:"Philip Jacobs",archived:false,hs:{stage:"driving_utilization",seats:"3",am:1592156152},meetings:[{date:"2025-07-02",title:"Kick Off – Mod Bath",dur:"30 min",src:"gong",att:[{n:"Philip Jacobs",t:"OCC",e:""},{n:"Sam Rydell",t:"CEO",e:""}]}]},
+  {name:"Go Roofing",onboarder:"Philip Jacobs",archived:false,hs:{stage:"driving_utilization",seats:"3",am:63601710},meetings:[{date:"2025-11-06",title:"Kickoff Call",dur:"38 min",src:"zoom",att:[]}]},
   {name:"Window Depot USA of Fort Wayne",onboarder:"Philip Jacobs",archived:false,hs:{stage:"driving_utilization",seats:"1",am:116399656},meetings:[{date:"2025-05-02",title:"Kickoff Call",dur:"36 min",src:"zoom",att:[]}]},
   {name:"Bath Planet of Paducah",onboarder:"Philip Jacobs",archived:false,hs:{stage:"driving_utilization",seats:"1",am:1592156152},meetings:[{date:"2025-06-03",title:"Onboarding",dur:"30 min",src:"zoom",att:[{n:"Philip Jacobs",t:"OCC",e:""},{n:"Andy Haas",t:"President",e:""}]}]},
-  {name:"Donaway Bath",onboarder:"Philip Jacobs",archived:false,hs:{stage:"driving_utilization",seats:"3",am:173758648},meetings:[{date:"2025-03-11",title:"Donaway Bath Kickoff",dur:"30 min",src:"zoom",att:[{n:"Philip Jacobs",t:"OCC",e:""},{n:"Galen Gardner",t:"Owner",e:""}]}]},
+  {name:"Donaway Bath",onboarder:"Philip Jacobs",archived:false,hs:{stage:"driving_utilization",seats:"3",am:871380365},meetings:[{date:"2025-03-11",title:"Donaway Bath Kickoff",dur:"30 min",src:"zoom",att:[{n:"Philip Jacobs",t:"OCC",e:""},{n:"Galen Gardner",t:"Owner",e:""}]}]},
   {name:"Re-Bath of New England",onboarder:"Philip Jacobs",archived:false,hs:{stage:"build_in_progress",seats:"24",am:1592156152},meetings:[]},
   {name:"Legacy Design & Remodeling",onboarder:"Philip Jacobs",archived:false,hs:{stage:"build_completed",seats:"7",am:495868686},meetings:[]},
   // NICO VALENZUELA
@@ -418,6 +471,7 @@ function renderMain(){
   document.getElementById("ppct").textContent=pct+"%";
   document.getElementById("tBoard").className="tb"+(tab==="board"?" ta":"");
   document.getElementById("tMeet").className="tb"+(tab==="meetings"?" ta":"");
+  document.getElementById("tIns").className="tb"+(tab==="insights"?" ta":"");
   const isC=view==="client";
   let h="";
 
@@ -487,15 +541,10 @@ ${cl.onboarder?`<div class="meta-lbl" style="margin-bottom:5px">Onboarded By</di
 </div>`:''}
 </div>`;
     ph.forEach((phase,pi)=>{
-      const dnt=phase.id==="p2d"?0:phase.tasks.filter(t=>t.complete||t.status==="Completed").length;
-      h+=`<div><div class="ph-hdr" onclick="tgP(${gi},${pi})"><span class="ph-arr" style="color:${phase.color}">${phase.open?"▼":"▶"}</span><span class="ph-lbl" style="color:${phase.color}">${phase.label}</span><span class="ph-cnt">${phase.id==="p2d"?`(${cl.meetings.length} meeting${cl.meetings.length!==1?"s":""})`:`(${dnt}/${phase.tasks.length})`}</span></div>`;
+      if(phase.id==="p2d") return; // Meetings are shown in the Meetings tab
+      const dnt=phase.tasks.filter(t=>t.complete||t.status==="Completed").length;
+      h+=`<div><div class="ph-hdr" onclick="tgP(${gi},${pi})"><span class="ph-arr" style="color:${phase.color}">${phase.open?"▼":"▶"}</span><span class="ph-lbl" style="color:${phase.color}">${phase.label}</span><span class="ph-cnt">(${dnt}/${phase.tasks.length})</span></div>`;
       if(phase.open){
-        if(phase.id==="p2d"){
-          h+=`<div class="mwrap"><div class="mhdr"><span style="min-width:82px">Date</span><span style="flex:1">Meeting</span><span style="min-width:52px;text-align:right">Duration</span><span style="min-width:72px">Attendees</span><span style="width:18px"></span></div>`;
-          if(!cl.meetings.length){h+=`<div style="padding:18px 13px;text-align:center;font-size:11px;color:#4b5563">No meetings recorded yet.</div>`;}
-          else{cl.meetings.forEach((m,mi)=>{const atts=m.att||[];h+=`<div class="mr" onclick="tgM('bm${gi}-${mi}','ba${gi}-${mi}')"><div class="mri"><div class="mdate">${m.date}</div><div style="flex:1;display:flex;align-items:center;gap:7px;min-width:0"><span class="mtitle">${m.title}</span><span class="msrc ${m.src==="gong"?"gb":"zb"}">${m.src==="gong"?"Gong":"Zoom"}</span></div><div class="mdur">${m.dur}</div><div class="avrow">${atts.slice(0,3).map((a,i)=>`<div class="av" style="background:${ac(a.n)};margin-left:${i?"-5px":"0"}">${ini(a.n)}</div>`).join("")}${atts.length>3?`<div class="av" style="background:#374151;margin-left:-5px">+${atts.length-3}</div>`:""}</div><div id="ba${gi}-${mi}" style="font-size:9px;color:#374151;width:18px;text-align:center">▼</div></div><div class="mexp" id="bm${gi}-${mi}"><div class="ahhdr">Attendees · ${atts.length}</div>${atts.map(a=>`<div class="atrow"><div class="atav" style="background:${ac(a.n)}">${ini(a.n)}</div><div><div class="atn">${a.n}</div><div class="ats">${[a.t,a.e].filter(Boolean).join(" · ")}</div></div></div>`).join("")}${!atts.length?'<div style="font-size:11px;color:#4b5563;font-style:italic">No attendee data.</div>':""}</div></div>`;})}
-          h+=`</div>`;
-        }else{
           h+=`<div class="tw"><table><colgroup><col style="width:22px"><col style="width:20px"><col style="width:22%"><col style="width:95px"><col style="width:140px"><col style="width:100px"><col style="width:100px"><col style="width:95px"><col style="width:22px"></colgroup><thead><tr><th></th><th></th><th>Task</th><th style="text-align:center">Priority</th><th style="text-align:center">Status</th><th class="col-assigned" style="text-align:center">Assigned To</th><th class="col-goal" style="text-align:center">Goal Date</th><th class="col-completed" style="text-align:center">Completed</th><th></th></tr></thead><tbody>`;
           phase.tasks.forEach((task,ti)=>{
             const ps=PS[task.priority]||PS.Medium;const ss=SS[task.status]||SS[""];
@@ -520,26 +569,160 @@ ${cl.onboarder?`<div class="meta-lbl" style="margin-bottom:5px">Onboarded By</di
           });
           if(!isC){h+=`<tr><td colspan="9"><span class="addrow" onclick="addT(${gi},${pi})">+ Add task</span></td></tr>`;}
           h+=`</tbody></table></div>`;
-        }
       }
       h+=`</div>`;
     });
+  }else if(tab==="insights"){
+    // Build context from transcripts
+    const allMeta=mMeta[cl.name]||{};
+    const txMeetings=cl.meetings.map((m,i)=>({...m,meta:getMeta(cl.name,i)})).filter(m=>m.meta.transcript.trim());
+    const hasTx=txMeetings.length>0;
+    h+=`<div class="ins-wrap">`;
+    h+=`<div style="font-size:11px;font-weight:600;color:#f9fafb;margin-bottom:2px">✦ Insights — ${cl.name}</div>`;
+    h+=`<div style="font-size:10px;color:#4b5563;margin-bottom:8px">${hasTx?txMeetings.length+" transcript"+(txMeetings.length!==1?"s":"")+` loaded · `+txMeetings.map(m=>m.title).join(", "):"No transcripts — paste transcript text in the Meetings tab to get started"}</div>`;
+    if(!hasTx){
+      h+=`<div class="ins-empty"><div class="ins-empty-icon">📋</div><div><strong style="color:#e5e7eb">No transcripts yet</strong><br>Go to <strong style="color:#a78bfa">Meetings</strong>, expand a meeting, and paste the transcript text.</div></div>`;
+    }else{
+      const SUGGESTED=["What product lines did they say were the top priority?","When did they want to be ready for training?","What was their ideal go-live date?","What concerns or objections did they raise?","Who are the key decision makers and stakeholders?","What integrations did they mention needing?","What pain points did they express?","What did they say about budget or payments?"];
+      h+=`<div id="ins-sq-${gi}" class="sq-grid">${SUGGESTED.map((q,qi)=>`<button class="sq" onclick="insAsk(${gi},'${q.replace(/'/g,"\'")}',${JSON.stringify(SUGGESTED.map((x,i)=>i)).replace(/"/g,"'")})">${q}</button>`).join("")}</div>`;
+    }
+    h+=`<div class="chat-log" id="ins-log-${gi}"></div>`;
+    h+=`<div class="chat-input-row">
+      <button class="chat-clear" id="ins-clr-${gi}" onclick="insClear(${gi})" style="display:none">Clear</button>
+      <textarea class="chat-textarea" id="ins-inp-${gi}" rows="2" placeholder="Ask anything about these meetings… (Enter to send)" ${!hasTx?"disabled":""}
+        onkeydown="if(event.key==='Enter'&&!event.shiftKey){event.preventDefault();insSend(${gi});}"></textarea>
+      <button class="chat-send" id="ins-btn-${gi}" onclick="insSend(${gi})" ${!hasTx?"disabled":""}>Ask</button>
+    </div>`;
+    h+=`</div>`;
   }else{
     const ms=cl.meetings;const tm=ms.reduce((a,m)=>a+(parseInt(m.dur)||0),0);
     h+=`<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:11px"><div style="font-size:11px;color:#4b5563">${ms.length} meeting${ms.length!==1?"s":""} · ${tm} min total</div><div style="display:flex;gap:8px"><span class="msrc gb">Gong</span><span class="msrc zb">Zoom</span></div></div>`;
     if(!ms.length){h+=`<div style="padding:22px;text-align:center;color:#374151;font-size:11px">No meetings recorded yet.</div>`;}
-    else{ms.forEach((m,mi)=>{const atts=m.att||[];h+=`<div style="margin-bottom:7px;border:1px solid #1f2937;border-radius:8px;overflow:hidden;background:#111827"><div class="mri" style="cursor:pointer" onclick="tgM('tm${gi}-${mi}','ta${gi}-${mi}')"><div class="mdate">${m.date}</div><div style="flex:1;display:flex;align-items:center;gap:7px;min-width:0"><span class="mtitle">${m.title}</span><span class="msrc ${m.src==="gong"?"gb":"zb"}">${m.src==="gong"?"Gong":"Zoom"}</span></div><div class="mdur">${m.dur}</div><div class="avrow">${atts.slice(0,3).map((a,i)=>`<div class="av" style="background:${ac(a.n)};margin-left:${i?"-5px":"0"}">${ini(a.n)}</div>`).join("")}</div><div id="ta${gi}-${mi}" style="font-size:9px;color:#374151;width:18px;text-align:center">▼</div></div><div class="mexp" id="tm${gi}-${mi}"><div class="ahhdr">Attendees · ${atts.length||"–"}</div>${atts.map(a=>`<div class="atrow"><div class="atav" style="background:${ac(a.n)}">${ini(a.n)}</div><div><div class="atn">${a.n}</div><div class="ats">${[a.t,a.e].filter(Boolean).join(" · ")}</div></div></div>`).join("")}${!atts.length?'<div style="font-size:11px;color:#4b5563;font-style:italic">No attendee data.</div>':""}</div></div>`;});}
+    else{ms.forEach((m,mi)=>{
+      const atts=m.att||[];
+      const meta=getMeta(cl.name,mi);
+      const future=isFuture(m.date);
+      const effAtt=future?"Pending":meta.att;
+      const attCls=future?"att-pending":(ASTY[meta.att]||"att-attended");
+      const txHas=!!meta.transcript.trim();
+      h+=`<div style="margin-bottom:7px;border:1px solid ${future?"#1e3a5f":"#1f2937"};border-radius:8px;overflow:hidden;background:#111827">
+<div class="mri" style="cursor:pointer" onclick="tgM('tm${gi}-${mi}','ta${gi}-${mi}')">
+  <div class="mdate"><div style="font-weight:700;color:#f9fafb;font-size:12px">${fmtDate(m.date)}</div>${future?'<div style="font-size:9px;color:#60a5fa;font-weight:600;margin-top:1px">Upcoming</div>':''}</div>
+  <div style="flex:1;display:flex;align-items:center;gap:7px;min-width:0">
+    <span class="mtitle">${m.title}</span>
+    <span class="msrc ${m.src==="gong"?"gb":"zb"}">${m.src==="gong"?"Gong":"Zoom"}</span>
+    <span class="att-badge ${attCls}">${effAtt}</span>
+    ${meta.mtype?'<span style="font-size:9px;font-weight:600;color:#6b7280;background:#1f2937;padding:1px 6px;border-radius:8px">'+meta.mtype+'</span>':"" }
+  </div>
+  <div class="mdur">${m.dur}</div>
+  <div class="avrow">${atts.slice(0,3).map((a,i)=>`<div class="av" style="background:${ac(a.n)};margin-left:${i?"-5px":"0"}">${ini(a.n)}</div>`).join("")}</div>
+  <div id="ta${gi}-${mi}" style="font-size:9px;color:#374151;width:18px;text-align:center">▼</div>
+</div>
+<div class="mexp" id="tm${gi}-${mi}">
+  <div style="display:flex;gap:10px;flex-wrap:wrap;margin-bottom:8px;align-items:center">
+    <div style="display:flex;align-items:center;gap:5px">
+      <span style="font-size:9px;color:#4b5563;text-transform:uppercase;letter-spacing:.07em">Type</span>
+      <datalist id="mtype-dl-${gi}-${mi}">${MTYPES.map(t=>'<option value="'+t+'">').join('')}</datalist>
+      <input list="mtype-dl-${gi}-${mi}" value="${meta.mtype||''}" placeholder="— select or type —" style="font-size:11px;padding:2px 5px;background:#1a2030;border:1px solid #374151;border-radius:5px;color:#a78bfa;width:150px;outline:none" onclick="event.stopPropagation()" oninput="setMeta('${cl.name.replace(/'/g,"\'")}',${mi},'mtype',this.value)">
+    </div>
+    <div style="display:flex;align-items:center;gap:5px">
+      <span style="font-size:9px;color:#4b5563;text-transform:uppercase;letter-spacing:.07em">Status</span>
+      ${future?'<span class="att-badge att-pending">Pending</span>':'<select class="mat-sel" onchange="setMeta(\''+cl.name.replace(/'/g,"\\'")+"',"+mi+",'att',this.value);renderMain()\" onclick=\"event.stopPropagation()\">"+ASTATUS.map(s=>'<option value="'+s+'"'+(meta.att===s?' selected':'')+'>'+s+'</option>').join('')+'</select>'}
+    </div>
+    <div style="display:flex;align-items:center;gap:5px">
+      <span style="font-size:9px;color:#4b5563;text-transform:uppercase;letter-spacing:.07em">Transcript</span>
+      <input value="${meta.txUrl}" placeholder="Paste link…" style="font-size:10px;padding:2px 5px;background:#1a2030;border:1px solid #374151;border-radius:5px;color:#9ca3af;width:120px;outline:none" onclick="event.stopPropagation()" oninput="setMeta('${cl.name.replace(/'/g,"\'")}',${mi},'txUrl',this.value)">
+      ${meta.txUrl?'<a href="'+meta.txUrl+'" target="_blank" style="font-size:10px;color:#a78bfa;text-decoration:none" onclick="event.stopPropagation()">Open ↗</a>':''}
+    </div>
+  </div>
+  <div style="display:flex;align-items:center;gap:6px;margin-bottom:5px">
+    <button class="tx-toggle ${txHas?"has":""}" onclick="event.stopPropagation();tgTx('tx-t${gi}-${mi}')">${txHas?"✓ Transcript":"Paste transcript"}</button>
+    ${txHas?'<span style="font-size:9px;color:#4b5563">'+meta.transcript.trim().split(/\s+/).length+' words</span>':''}
+  </div>
+  <textarea id="tx-t${gi}-${mi}" class="tx-area" style="display:none" placeholder="Paste full transcript text here — used by ✦ Insights to answer questions" onclick="event.stopPropagation()" oninput="setMeta('${cl.name.replace(/'/g,"\'")}',${mi},'transcript',this.value)">${meta.transcript}</textarea>
+  <div class="ahhdr">Attendees · ${atts.length||"–"}</div>
+  ${atts.map(a=>`<div class="atrow"><div class="atav" style="background:${ac(a.n)}">${ini(a.n)}</div><div><div class="atn">${a.n}</div><div class="ats">${[a.t,a.e].filter(Boolean).join(" · ")}</div></div></div>`).join("")}${!atts.length?'<div style="font-size:11px;color:#4b5563;font-style:italic">No attendee data.</div>':''}
+</div></div>`;});}
   }
   document.getElementById("mc").innerHTML=h;
 }
 
-function render(){renderSB();renderMain();}
+function render(){renderSB();renderMain();if(document.getElementById("tIns"))document.getElementById("tIns").className="tb"+(tab==="insights"?" ta":"");}
 function selC(i){si=i;tab="board";render();if(window.innerWidth<=768)closeMobSidebar();}
 function setO(o){of=o;si=0;render();}
 function setA(a){af=a;si=0;render();}
 function setSt(s){stf=s;si=0;render();}
 function sv(v){view=v;document.getElementById("bInt").className="vb"+(v==="internal"?" va":"");document.getElementById("bCli").className="vb"+(v==="client"?" va":"");renderMain();}
-function setTab(t){tab=t;renderMain();}
+function setTab(t){
+  tab=t;
+  document.getElementById("tBoard").className="tb"+(t==="board"?" ta":"");
+  document.getElementById("tMeet").className="tb"+(t==="meetings"?" ta":"");
+  document.getElementById("tIns").className="tb"+(t==="insights"?" ta":"");
+  renderMain();
+}
+function tgTx(id){const el=document.getElementById(id);if(el)el.style.display=el.style.display==="block"?"none":"block";}
+
+// ── INSIGHTS CHAT ────────────────────────────────────────────
+const insHistory={};
+async function insAsk(gi,q){
+  const sq=document.getElementById("ins-sq-"+gi);if(sq)sq.style.display="none";
+  await insRunAsk(gi,q);
+}
+async function insSend(gi){
+  const inp=document.getElementById("ins-inp-"+gi);if(!inp)return;
+  const q=inp.value.trim();if(!q)return;
+  inp.value="";
+  const sq=document.getElementById("ins-sq-"+gi);if(sq)sq.style.display="none";
+  await insRunAsk(gi,q);
+}
+function insClear(gi){
+  insHistory[gi]=[];
+  const log=document.getElementById("ins-log-"+gi);if(log)log.innerHTML="";
+  const sq=document.getElementById("ins-sq-"+gi);if(sq)sq.style.display="flex";
+  const clr=document.getElementById("ins-clr-"+gi);if(clr)clr.style.display="none";
+}
+function insAppend(gi,cls,txt){
+  const log=document.getElementById("ins-log-"+gi);if(!log)return null;
+  const d=document.createElement("div");d.className="chat-bubble "+cls;d.textContent=txt;
+  log.appendChild(d);log.scrollTop=log.scrollHeight;return d;
+}
+async function insRunAsk(gi,q){
+  if(!insHistory[gi])insHistory[gi]=[];
+  const fcs=fc();const cl=fcs[Math.min(si,Math.max(0,fcs.length-1))];
+  insAppend(gi,"cb-user",q);
+  const clr=document.getElementById("ins-clr-"+gi);if(clr)clr.style.display="block";
+  const btn=document.getElementById("ins-btn-"+gi);if(btn)btn.disabled=true;
+  const thinking=insAppend(gi,"cb-thinking","Analyzing transcripts…");
+  const txMeetings=cl.meetings.map((m,i)=>({...m,meta:getMeta(cl.name,i)})).filter(m=>m.meta.transcript.trim());
+  const context=txMeetings.map(m=>"=== MEETING: "+m.title+" | "+m.date+" | "+(m.meta.mtype||m.src)+" ===\n"+m.meta.transcript.trim()).join("\n\n");
+  const sys="You are an onboarding analyst for OCC (One Click Contractor). You have meeting transcripts for \""+cl.name+"\". Answer questions about what was discussed. Be specific, cite which meeting, quote or paraphrase directly. If info isn't in the transcripts, say so clearly. Use bullets for multiple items.\n\nMEETING TRANSCRIPTS:\n"+context;
+  insHistory[gi].push({role:"user",content:q});
+  try{
+    if(!ANTHROPIC_KEY||ANTHROPIC_KEY==="YOUR_API_KEY_HERE"){
+      throw new Error("No API key set. Add your Anthropic key to the ANTHROPIC_KEY constant at the top of the script.");
+    }
+    const res=await fetch("https://api.anthropic.com/v1/messages",{
+      method:"POST",
+      headers:{
+        "Content-Type":"application/json",
+        "x-api-key":ANTHROPIC_KEY,
+        "anthropic-version":"2023-06-01",
+        "anthropic-dangerous-direct-browser-access":"true"
+      },
+      body:JSON.stringify({model:"claude-sonnet-4-20250514",max_tokens:1000,system:sys,messages:insHistory[gi]})
+    });
+    const data=await res.json();
+    if(data.error)throw new Error(data.error.message);
+    const reply=(data.content||[]).find(function(b){return b.type==="text";})||{text:"No response."};
+    insHistory[gi].push({role:"assistant",content:reply.text});
+    if(thinking&&thinking.parentNode)thinking.parentNode.removeChild(thinking);
+    insAppend(gi,"cb-ai",reply.text);
+  }catch(e){
+    if(thinking&&thinking.parentNode)thinking.parentNode.removeChild(thinking);
+    insHistory[gi].pop();
+    insAppend(gi,"cb-err","Error: "+e.message);
+  }finally{if(btn)btn.disabled=false;}
+}
 function toggleArch(){showArch=!showArch;si=0;of="All";af="All";stf="All";render();}
 
 function toggleMobSidebar(){
