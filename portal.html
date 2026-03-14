@@ -296,6 +296,10 @@ textarea{width:100%;font-size:11px;padding:5px 8px;background:#111827;border:1px
   <button class="arch-toggle" onclick="toggleArch()" id="archBtn">📁 Show Archived (0)</button>
 
   <div class="sb-footer" id="synctime">Last synced: Live · Mar 14, 2026</div>
+  <div style="padding:5px 10px;border-top:1px solid #1f2937;display:flex;align-items:center;justify-content:space-between">
+    <span id="save-indicator" style="font-size:9px;color:#374151">● Saved</span>
+    <button onclick="if(confirm('Clear all saved progress? This cannot be undone.'))Storage.clearAll(),location.reload();" style="font-size:9px;color:#4b5563;background:none;border:none;cursor:pointer;padding:2px 4px;border-radius:3px" title="Clear all locally saved data">↺ Reset</button>
+  </div>
 </div>
 <div class="main">
   <div class="topbar">
@@ -357,7 +361,7 @@ const ASTY={Attended:"att-attended",Canceled:"att-canceled",Postponed:"att-postp
 // Stored as mMeta[clientName][meetingIndex]
 const mMeta={};
 function getMeta(cname,mi){if(!mMeta[cname])mMeta[cname]={};if(!mMeta[cname][mi])mMeta[cname][mi]={mtype:"",att:"Attended",txUrl:"",transcript:""};return mMeta[cname][mi];}
-function setMeta(cname,mi,key,val){getMeta(cname,mi)[key]=val;}
+function setMeta(cname,mi,key,val){getMeta(cname,mi)[key]=val;autosave();}
 function fmtDate(d){if(!d)return"–";const p=d.split("-");const m=["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];return m[parseInt(p[1])-1]+" "+parseInt(p[2])+", "+p[0];}
 function isFuture(d){return d&&new Date(d+"T00:00:00")>new Date();}
 const PS={Critical:{bg:"#dc2626",t:"#fff"},High:{bg:"#f97316",t:"#fff"},Medium:{bg:"#eab308",t:"#1a1a00"},Low:{bg:"#22c55e",t:"#fff"}};
@@ -373,6 +377,112 @@ const PT=[
 
 // Per-client Go Live Date storage
 const goLiveDates={};
+
+// ═══════════════════════════════════════════════════════════════
+// STORAGE LAYER
+// ---------------------------------------------------------------
+// Current backend: localStorage (Option 1)
+// To upgrade to a real backend (Option 3/4), replace the three
+// functions below — save(), load(), and clearStorage() — with
+// fetch() calls to your Cloudflare Worker / Supabase endpoint.
+// Everything else in the app calls Storage.save() / Storage.load()
+// and doesn't care what's underneath.
+//
+// Future backend swap example:
+//   async save(key, val) {
+//     await fetch('https://your-worker.workers.dev/set', {
+//       method:'POST', body: JSON.stringify({key, val}),
+//       headers:{'Authorization':'Bearer YOUR_TOKEN'}
+//     });
+//   }
+//   async load(key) {
+//     const r = await fetch('https://your-worker.workers.dev/get?key='+key);
+//     return r.ok ? r.json() : null;
+//   }
+// ═══════════════════════════════════════════════════════════════
+const STORAGE_VERSION = "occ_v1";
+const Storage = {
+  save(key, val) {
+    try {
+      localStorage.setItem(STORAGE_VERSION + "_" + key, JSON.stringify(val));
+    } catch(e) { console.warn("Storage.save failed:", e); }
+  },
+  load(key) {
+    try {
+      const raw = localStorage.getItem(STORAGE_VERSION + "_" + key);
+      return raw ? JSON.parse(raw) : null;
+    } catch(e) { return null; }
+  },
+  remove(key) {
+    try { localStorage.removeItem(STORAGE_VERSION + "_" + key); } catch(e) {}
+  },
+  clearAll() {
+    try {
+      Object.keys(localStorage).filter(k => k.startsWith(STORAGE_VERSION)).forEach(k => localStorage.removeItem(k));
+    } catch(e) {}
+  }
+};
+
+// ── SAVE / LOAD HELPERS ──────────────────────────────────────
+function saveAll() {
+  Storage.save("phases", phases.map(ph => ph.map(p => ({
+    id: p.id, open: p.open, _wasComplete: p._wasComplete,
+    tasks: p.tasks.map(t => ({
+      task: t.task, priority: t.priority, status: t.status,
+      occ: t.occ, goalDate: t.goalDate, completedDate: t.completedDate,
+      comment: t.comment, _open: t._open, complete: t.complete
+    }))
+  }))));
+  Storage.save("goLiveDates", goLiveDates);
+  Storage.save("mMeta", mMeta);
+}
+
+function loadAll() {
+  // Load phases
+  const savedPhases = Storage.load("phases");
+  if (savedPhases && savedPhases.length === phases.length) {
+    savedPhases.forEach((savedPh, gi) => {
+      savedPh.forEach((savedP, pi) => {
+        if (!phases[gi][pi]) return;
+        phases[gi][pi].open = savedP.open !== undefined ? savedP.open : true;
+        phases[gi][pi]._wasComplete = savedP._wasComplete || false;
+        // Merge saved tasks — match by index, preserve template structure
+        savedP.tasks.forEach((savedT, ti) => {
+          if (!phases[gi][pi].tasks[ti]) {
+            // Extra tasks added by user — push them
+            phases[gi][pi].tasks.push({...savedT, _open: savedT._open||false});
+          } else {
+            Object.assign(phases[gi][pi].tasks[ti], savedT);
+          }
+        });
+        // Trim if fewer tasks saved (shouldn't happen but safety)
+      });
+    });
+  }
+  // Load goLiveDates
+  const savedGLD = Storage.load("goLiveDates");
+  if (savedGLD) Object.assign(goLiveDates, savedGLD);
+  // Load mMeta
+  const savedMeta = Storage.load("mMeta");
+  if (savedMeta) Object.assign(mMeta, savedMeta);
+}
+
+// Auto-save on every state change — called at end of all mutating functions
+function autosave() {
+  saveAll();
+  // Flash save indicator
+  var ind = document.getElementById('save-indicator');
+  if(ind){
+    ind.textContent = '● Saving…';
+    ind.style.color = '#a78bfa';
+    clearTimeout(autosave._t);
+    autosave._t = setTimeout(function(){
+      ind.textContent = '● Saved';
+      ind.style.color = '#4ade80';
+      setTimeout(function(){ind.style.color='#374151';},1500);
+    }, 300);
+  }
+}
 
 // === LIVE CLIENT DATA (synced Mar 14, 2026) ===
 const CLIENTS=[
@@ -476,6 +586,9 @@ const CLIENTS=[
 let phases=CLIENTS.map(()=>PT.map(p=>({...p,open:true,tasks:p.tasks.map(t=>({...t}))})));
 let si=0,view="internal",tab="board",of="All",af="All",stf="All",srch="",showArch=false;
 
+// Restore persisted state from storage
+loadAll();
+
 const ONB=["All",...[...new Set(CLIENTS.filter(c=>!c.archived&&c.onboarder).map(c=>c.onboarder))].sort()];
 const AML=["All",...[...new Set(CLIENTS.filter(c=>!c.archived&&c.hs.am).map(c=>OM[c.hs.am]||"").filter(Boolean))].sort()];
 const STAGES=["All","Paid","Waiting on Materials","Build In Progress","Build Completed","Driving Utilization"];
@@ -577,7 +690,7 @@ ${cl.archived?'<div class="arch-banner">📁 Archived — '+stageLabel+'</div>':
   <div class="meta-block">
     <div class="meta-lbl">Goal Go Live Date</div>
     <div class="cal-wrap">
-      <button class="cal-btn glv${goLiveDates[cl.name]?'':' empty'}" id="cal-trigger-glv-${gi}" onclick="openCalFor('glv-${gi}',goLiveDates['${cl.name.replace(/'/g,"\'")}']||'',function(v){goLiveDates['${cl.name.replace(/'/g,"\'")}\']=v;renderMain();})">
+      <button class="cal-btn glv${goLiveDates[cl.name]?'':' empty'}" id="cal-trigger-glv-${gi}" onclick="openCalFor('glv-${gi}',goLiveDates['${cl.name.replace(/'/g,"\'")}']||'',function(v){goLiveDates['${cl.name.replace(/'/g,"\'")}']=v;autosave();renderMain();}))">
         ${goLiveDates[cl.name]?fmtDate(goLiveDates[cl.name]):'📅 Pick date'}
       </button>
       <div class="cal-drop" id="cal-drop-glv-${gi}"></div>
@@ -1149,18 +1262,18 @@ document.addEventListener("click",function(e){
   }
 });
 // updGLV now handled inline in calendar callback
-function updTN(gi,pi,ti,v){phases[gi][pi].tasks[ti].task=v;}
-function tgP(gi,pi){phases[gi][pi].open=!phases[gi][pi].open;renderMain();}
+function updTN(gi,pi,ti,v){phases[gi][pi].tasks[ti].task=v;autosave();}
+function tgP(gi,pi){phases[gi][pi].open=!phases[gi][pi].open;autosave();renderMain();}
 function tgT(gi,pi,ti){
   const t=phases[gi][pi].tasks[ti];
   t.complete=!t.complete;
   if(t.complete){if(!t.completedDate){stamp(t);}t.status="Completed";}
   else{t.completedDate="";if(t.status==="Completed"){t.status="Not Started";}}
-  renderMain();
+  autosave();renderMain();
 }
 function tgC(gi,pi,ti){phases[gi][pi].tasks[ti]._open=!phases[gi][pi].tasks[ti]._open;renderMain();}
-function updC(gi,pi,ti,v){phases[gi][pi].tasks[ti].comment=v;renderMain();}
-function updP(gi,pi,ti,v){phases[gi][pi].tasks[ti].priority=v;renderMain();}
+function updC(gi,pi,ti,v){phases[gi][pi].tasks[ti].comment=v;autosave();renderMain();}
+function updP(gi,pi,ti,v){phases[gi][pi].tasks[ti].priority=v;autosave();renderMain();}
 function stamp(t){const now=new Date();const d=now.toLocaleDateString("en-US",{month:"short",day:"numeric",year:"numeric"});const tm=now.toLocaleTimeString("en-US",{hour:"numeric",minute:"2-digit",hour12:true});t.completedDate=d+" · "+tm;}
 function updS(gi,pi,ti,v){
   const t=phases[gi][pi].tasks[ti];
@@ -1172,15 +1285,12 @@ function updS(gi,pi,ti,v){
     t.complete=false;
     t.completedDate="";
   }
-  renderMain();
+  autosave();renderMain();
 }
-function updO(gi,pi,ti,v){phases[gi][pi].tasks[ti].occ=v;}
+function updO(gi,pi,ti,v){phases[gi][pi].tasks[ti].occ=v;autosave();}
 function updGD(gi,pi,ti,v){
   phases[gi][pi].tasks[ti].goalDate=v;
-  // Update button label in place without full re-render
-  var btn=document.querySelector('#gd-'+gi+'-'+pi+'-'+ti+' ~ button, #gd-'+gi+'-'+pi+'-'+ti);
-  // Re-render to sync Gantt etc
-  renderMain();
+  autosave();renderMain();
 }
 let _delGi,_delPi,_delTi;
 function delT(gi,pi,ti){
@@ -1191,11 +1301,11 @@ function delT(gi,pi,ti){
 function closeDelModal(){document.getElementById("delModal").classList.remove("show");}
 function confirmDel(){
   phases[_delGi][_delPi].tasks.splice(_delTi,1);
-  closeDelModal();
+  autosave();closeDelModal();
   renderMain();
 }
 document.getElementById("delModal").addEventListener("click",function(e){if(e.target===this)closeDelModal();});
-function addT(gi,pi){phases[gi][pi].tasks.push({task:"New task",priority:"Medium",status:"Not Started",occ:"",goalDate:"",completedDate:"",comment:"",_open:false,complete:false});renderMain();}
+function addT(gi,pi){phases[gi][pi].tasks.push({task:"New task",priority:"Medium",status:"Not Started",occ:"",goalDate:"",completedDate:"",comment:"",_open:false,complete:false});autosave();renderMain();}
 function tgM(id,arrid){const el=document.getElementById(id);const arr=document.getElementById(arrid);if(el){const open=el.style.display!=="block";el.style.display=open?"block":"none";if(arr)arr.textContent=open?"▲":"▼";}}
 render();
 </script>
